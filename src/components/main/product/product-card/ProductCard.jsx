@@ -87,7 +87,7 @@ export default function ProductCard({ product }) {
 
           <div className="absolute right-4 top-4 z-20 flex items-center gap-2">
             {fresh && (
-              <span className="rounded-full bg-[#0B3C5D] px-3 py-1 text-[11px] font-bold text-white shadow-md shadow-[#0B3C5D]/20">
+              <span className="rounded-full bg-[#0B3C5D] px-3 py-1 text-[12px] font-bold text-white shadow-md shadow-[#0B3C5D]/20">
                 تازه
               </span>
             )}
@@ -142,7 +142,7 @@ export default function ProductCard({ product }) {
 
             <button
               type="button"
-              className="flex h-12 w-12 items-center justify-center rounded-[20px] bg-[#0B3C5D] text-white shadow-md shadow-[#0B3C5D]/20 transition-all duration-300 hover:bg-[#08507D] hover:shadow-lg hover:shadow-[#0B3C5D]/30 active:scale-95"
+              className="flex h-12 w-12 items-center justify-center rounded-[20px] bg-blue-600 text-white shadow-md shadow-[#0B3C5D]/20 transition-all duration-300 hover:bg-sky-500 hover:shadow-lg hover:shadow-[#0B3C5D]/30 active:scale-95"
               aria-label="Add to cart"
             >
               <HiOutlineShoppingBag className="text-[22px]" />

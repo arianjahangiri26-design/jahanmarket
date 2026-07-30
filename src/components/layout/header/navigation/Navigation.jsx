@@ -34,9 +34,9 @@ const Navigation = () => {
 
             <Button
               variant="light"
-              className="hidden h-10 items-center gap-2 rounded-xl border border-[#DDE9F3] bg-[linear-gradient(135deg,#FFFFFF_0%,#F5FAFE_100%)] px-4 font-bold text-[#5F7893] shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[#C6DCEC] hover:text-[#0B3C5D] lg:flex"
+              className="hidden h-10 items-center gap-2 rounded-xl border border-[#DDE9F3] bg-[linear-gradient(135deg,#FFFFFF_0%,#F5FAFE_100%)] px-4 font-bold  text-blue-500 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[#C6DCEC] hover:text-[#0B3C5D] lg:flex"
             >
-              <FiMapPin className="h-4.5 w-4.5 text-[#0B3C5D]" />
+              <FiMapPin className="h-4.5 w-4.5 text-blue-600" />
               <span>ارسال به شهر شما</span>
             </Button>
           </div>

@@ -9,7 +9,8 @@ import { authOptions } from "../../auth/[...nextauth]/route";
 
 import Product from "@/models/product";
 import "@/models/Category";
-import "@/models/users";
+    import "@/models/users";
+
 
 export async function GET() {
   try {

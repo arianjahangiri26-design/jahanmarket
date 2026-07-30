@@ -71,7 +71,7 @@ const Header = () => {
 
             <Link
               href="/cart"
-              className="group relative flex h-11 w-11 items-center justify-center rounded-2xl border border-[#E2E8F0] bg-gradient-to-br from-white to-[#0B3C5D]/5 text-[#627D98] shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[#0B3C5D]/30 hover:text-[#0B3C5D] active:scale-95 sm:h-auto sm:w-auto sm:px-4 sm:py-2.5"
+              className="group relative flex h-11 w-11 items-center justify-center rounded-2xl border border-[#E2E8F0] bg-gradient-to-br from-white to-[#0B3C5D]/5 text-blue-600 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[#0B3C5D]/30   active:scale-95 sm:h-auto sm:w-auto sm:px-4 sm:py-2.5"
               aria-label="سبد خرید"
             >
               <FiShoppingCart className="h-6 w-6 transition-transform duration-300 group-hover:scale-110" />

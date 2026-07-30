@@ -48,7 +48,7 @@ export async function POST(req) {
         product: item.product._id,
         quantity: item.quantity,
         price: item.product.price,
-        sold: item.product.sold + 1
+        sold: item.product.sold + 1 
       })),
       totalPrice,
       discountPrice,

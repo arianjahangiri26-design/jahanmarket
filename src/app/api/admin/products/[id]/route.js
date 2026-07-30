@@ -8,8 +8,9 @@ import Product from "@/models/product";
 // NextAuth
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-   import category from "@/models/Category";
-   
+import category from "@/models/Category";
+import "@/models/users";
+
 // ==========================
 // GET Single Product
 // ==========================
@@ -88,7 +89,7 @@ export async function PUT(req, { params }) {
       description: data.get("description") || "",
       features,
       isActive: data.get("isActive") === "true",
-      // createdBy را آپدیت نمی‌کنیم
+
     };
 
     if (file && file.size > 0) {

@@ -80,7 +80,7 @@ const ProductSchema = new mongoose.Schema(
 
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Users",
       required: [true, "کاربر سازنده الزامی است"],
     },
   },

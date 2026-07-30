@@ -20,7 +20,7 @@ export function CartDesign({
   }, 0) || 0;
 
   const totalItemsCount = cart?.items?.reduce((acc, item) => acc + (item?.quantity || 0), 0) || 0;
- console.log(cart);
+  
  
   return (
     <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8 font-sans" dir="rtl">
@@ -32,7 +32,7 @@ export function CartDesign({
               <ShoppingBag className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-slate-800">سبد خرید شما</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-blue-400">سبد خرید شما</h1>
               <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
                 دارای {cart?.items?.length || 0} کالا در سبد خرید
               </p>

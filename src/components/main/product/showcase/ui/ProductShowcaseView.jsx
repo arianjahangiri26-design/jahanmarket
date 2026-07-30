@@ -45,12 +45,12 @@ export default function ProductShowcaseView({
           {href && (
             <Link
               href={href}
-              className="group flex items-center gap-2 rounded-full border border-[#D7E4F0] bg-white px-4 py-2 text-sm font-extrabold text-[#0B3C5D] transition-all duration-300 hover:border-[#BFD3E4] hover:bg-[#F7FBFF] hover:text-[#0F4F78]"
+              className="group flex items-center gap-2 rounded-full border border-[#D7E4F0] bg-white px-4 py-2 text-md font-extrabold text-[#0B3C5D] transition-all duration-300 hover:border-[#BFD3E4] hover:bg-[#F7FBFF] hover:text-[#0F4F78]"
             >
               مشاهده همه
               <ArrowLeft
                 size={18}
-                className="transition-transform duration-300 group-hover:-translate-x-1"
+                className="transition-transform text-blue-600 duration-300 group-hover:-translate-x-1"
               />
             </Link>
           )}
