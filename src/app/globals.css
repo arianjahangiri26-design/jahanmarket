@@ -1,28 +1,21 @@
 @import "tailwindcss";
- 
- 
+@import "@heroui/styles"; /* این تمام استایل‌های HeroUI v3 را وارد می‌کند */
 
+@theme {
+  /* تنظیمات تم اختصاصی شما در Tailwind v4 */
+  --color-background: #F8FAFC;
+  --color-text-main: #0A2540;
+  --color-text-muted: #627D98;
+  --color-primary-brand: #0B3C5D;
+  --color-accent-brand: #E25B45;
+}
 
 :root {
-  /* پس‌زمینه گرم و بسیار ملایم کل صفحات */
-  --background: #F8FAFC; 
-  
-  /* رنگ‌های متن اصلی و ثانویه */
-  --text-main: #0A2540;     /* سرمه‌ای تیره و عمیق */
-  --text-muted: #627D98;    /* خاکستری-آبی نرم */
-  
-  /* رنگ‌های برند و اصلی */
-  --primary: #0B3C5D;       /* آبی گرم و پرمیوم */
-  --primary-hover: #07263D; /* سرمه‌ای تیره برای هاور */
-  --accent: #E25B45;        /* مرجانی/آجری گرم برای تخفیف‌ها و جلب توجه */
-  
-  /* حاشیه‌ها و خطوط جداکننده */
-  --border-light: #E2E8F0;  /* مرزهای ظریف */
-  --border-hover: #90CDF4;  /* مرز هاور */
+  --background: var(--color-background);
+  --foreground: var(--color-text-main);
 }
 
 body {
   background-color: var(--background);
-  color: var(--text-main);
-  font-family: inherit; /* یا فونت فارسی خودتان مثل IRANSans, Vazirmatn */
+  color: var(--foreground);
 }

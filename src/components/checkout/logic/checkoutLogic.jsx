@@ -1,12 +1,14 @@
+// src/components/checkout/CheckoutLogic.jsx
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useCart } from "@/context/cart/CartContext";
 import { useFetch } from "@/hooks/crud/UseCrud";
-import { CheckoutDesign } from "../ui/checkoutDesign";
-import { useRouter } from "next/navigation";
  
+import { useRouter } from "next/navigation";
+import { toast } from "@heroui/react";
+import { CheckoutDesign } from "../ui/checkoutDesign";
  
 export function CheckoutLogic() {
   const { cart, loading: cartLoading, clearCart } = useCart();
@@ -15,11 +17,14 @@ export function CheckoutLogic() {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [discountError, setDiscountError] = useState("");
   const [hasDiscountApplied, setHasDiscountApplied] = useState(false);
-const router=useRouter();
+  const [selectedAddressId, setSelectedAddressId] = useState("");
+
+  const router = useRouter();
   const { register, handleSubmit, setValue, reset } = useForm({
     defaultValues: { discountCode: "" },
   });
 
+  // Sync discount states with context database values
   useEffect(() => {
     const savedDiscount = Number(cart?.discountPrice) || 0;
     setDiscountAmount(savedDiscount);
@@ -29,6 +34,7 @@ const router=useRouter();
 
   const cartItems = cart?.items || [];
 
+  // Calculate total price of products in cart
   const subtotal = useMemo(() => {
     return cartItems.reduce((total, item) => {
       const price = Number(item?.product?.price || 0);
@@ -37,15 +43,18 @@ const router=useRouter();
     }, 0);
   }, [cartItems]);
 
+  // Determine delivery shipping cost (Free if subtotal is over 1,000,000 tomans)
   const shippingAmount = useMemo(() => {
     if (subtotal === 0 || subtotal >= 1000000) return 0;
     return 50000;
   }, [subtotal]);
 
+  // Compute total payable amount
   const payableAmount = useMemo(() => {
     return Math.max(subtotal - discountAmount + shippingAmount, 0);
   }, [subtotal, discountAmount, shippingAmount]);
 
+  // Handle coupon validation request
   const handleApplyDiscount = async (formData) => {
     if (hasDiscountApplied) {
       setDiscountError("کد تخفیف قبلا اعمال شده است.");
@@ -76,6 +85,7 @@ const router=useRouter();
     setHasDiscountApplied(newDiscount > 0);
   };
 
+  // Reset coupon state
   const handleResetDiscount = () => {
     setDiscountAmount(0);
     setDiscountError("");
@@ -83,46 +93,59 @@ const router=useRouter();
     reset({ discountCode: "" });
   };
 
+  // Handle final checkout and order confirmation
   const handleOrderSubmit = async () => {
     if (requestLoading) return;
+    
+    // Ensure an address has been selected
+    if (!selectedAddressId) {
+      toast.error("لطفاً آدرس تحویل سفارش خود را مشخص کنید.");
+      return;
+    }
+
     setDiscountError("");
 
     const result = await request({
       url: "/api/order",
       method: "POST",
+      data: { addressId: selectedAddressId },
     });
 
-    // بررسی دقیق پاسخ خطا از بک‌اند با توجه به فرمت ارسالی
     if (!result?.success) {
       setDiscountError(result?.message || result?.error || "ثبت سفارش با خطا مواجه شد.");
       return;
     }
-  if(result.success){
- 
-  router.push("/")
-  }
-    if (clearCart) {
-      clearCart();
+
+    if (result.success) {
+      toast.success("سفارش شما با موفقیت ثبت شد", {
+        description: "پس از بررسی، مراحل پردازش و ارسال آغاز خواهد شد.",
+      });
+
+      if (clearCart) {
+        clearCart();
+      }
+      
+      router.push("/");
     }
   };
 
-  if (cartLoading && !cart || cart.items.length === 0) {
+  if (cartLoading && !cart) {
     return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-50" dir="rtl">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50" dir="rtl">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (cartItems.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50" dir="rtl">
         <div className="text-center">
           <p className="text-xl font-black text-slate-600">سبد خرید شما خالی است</p>
           <a href="/products" className="mt-4 inline-block font-bold text-blue-600 hover:underline">
             بازگشت به فروشگاه
           </a>
         </div>
-      </div>
-    );
-  }
-
-  if (cartItems.length === 0 || requestLoading ) {
-    return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50" dir="rtl">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -141,6 +164,8 @@ const router=useRouter();
       onSubmitDiscount={handleSubmit(handleApplyDiscount)}
       onResetDiscount={handleResetDiscount}
       onConfirmOrder={handleOrderSubmit}
+      selectedAddressId={selectedAddressId}
+      onSelectAddress={setSelectedAddressId}
     />
   );
 }

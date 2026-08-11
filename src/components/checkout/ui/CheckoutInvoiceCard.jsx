@@ -1,3 +1,4 @@
+// src/components/checkout/CheckoutInvoiceCard.jsx
 "use client";
 
 import React from "react";
@@ -27,7 +28,7 @@ export function CheckoutInvoiceCard({
           <h2 className="text-xl font-black text-slate-800">صورتحساب نهایی</h2>
         </div>
 
-        {/* آیتم‌های سبد خرید */}
+        {/* Invoice Item List */}
         <div className="mb-8 max-h-60 space-y-4 overflow-y-auto pr-1">
           {cartItems.map((item) => {
             const title = item?.product?.name || item?.name || "محصول";
@@ -57,7 +58,7 @@ export function CheckoutInvoiceCard({
           })}
         </div>
 
-        {/* فرم کد تخفیف */}
+        {/* Coupon Discount Form */}
         <form onSubmit={onSubmitDiscount} className="border-t border-slate-100 pb-4 pt-6">
           <label className="mb-2 block text-xs font-bold text-slate-500">کد تخفیف</label>
 
@@ -100,7 +101,7 @@ export function CheckoutInvoiceCard({
           ) : null}
         </form>
 
-        {/* ریز مقادیر مالی */}
+        {/* Price Breakdowns */}
         <div className="space-y-5 border-t border-slate-100 pt-6">
           <div className="flex items-center justify-between text-sm font-medium text-slate-500">
             <span>مجموع قیمت کالاها</span>
@@ -123,7 +124,7 @@ export function CheckoutInvoiceCard({
           </div>
         </div>
 
-        {/* مبلغ نهایی */}
+        {/* Final Payable Cost */}
         <div className="mt-8 border-t-2 border-dashed border-slate-200 pt-8">
           <div className="flex flex-col gap-2">
             <span className="text-sm font-bold text-slate-400">مبلغ قابل پرداخت:</span>
@@ -136,7 +137,7 @@ export function CheckoutInvoiceCard({
           </div>
         </div>
 
-        {/* دکمه پرداخت */}
+        {/* Checkout Confirmation Button */}
         <button
           onClick={onConfirmOrder}
           disabled={isLoading}
@@ -147,7 +148,7 @@ export function CheckoutInvoiceCard({
           <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-blue-500 opacity-0 transition-opacity group-hover:opacity-100"></div>
         </button>
 
-        {/* پانویس امنیتی */}
+        {/* Security Footer Details */}
         <div className="mt-8 flex flex-col items-center gap-4">
           <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
             <ShieldCheck className="h-4 w-4 text-emerald-500" />

@@ -72,6 +72,7 @@ const ProductSchema = new mongoose.Schema(
     sold: {
       type: Number,
       default: 0,
+      min: [0, "تعداد فروش نمی‌تواند منفی باشد"],
     },
     features: {
       type: [ProductFeatureSchema],

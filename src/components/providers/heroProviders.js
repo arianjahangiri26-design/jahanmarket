@@ -1,7 +1,10 @@
- "use client";
+"use client";
 
-import { HeroUIProvider } from "@heroui/react";
+import { Toast } from "@heroui/react";
 
 export function HeroProviders({ children }) {
-  return <HeroUIProvider>{children}</HeroUIProvider>;
+  return <>
+  
+    <Toast.Provider />
+  {children}</>;
 }

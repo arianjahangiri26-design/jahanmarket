@@ -1,9 +1,13 @@
+// src/components/checkout/CheckoutDesign.jsx
 "use client";
 
 import React from "react";
-import { MapPin, Truck, ShieldCheck, Info, CreditCard, Calendar, ChevronLeft } from "lucide-react";
+import { Truck, ShieldCheck, Info, CreditCard, Calendar } from "lucide-react";
 import { CheckoutInvoiceCard } from "./CheckoutInvoiceCard";
- 
+import { CheckoutAddressLogic } from "../logic/address/CheckoutAddressLogic";
+
+// Import the Logic wrapper component for address management instead of the old section.
+// NOTE: Make sure the relative import path points to your actual file location (e.g., in the same directory).
  
  
 export function CheckoutDesign({
@@ -19,11 +23,13 @@ export function CheckoutDesign({
   onSubmitDiscount,
   onResetDiscount,
   onConfirmOrder,
+  selectedAddressId,
+  onSelectAddress,
 }) {
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-8 font-sans sm:px-6 lg:px-8" dir="rtl">
       <div className="mx-auto max-w-7xl">
-        {/* هدر صفحه */}
+        {/* Page Header */}
         <div className="mb-10 flex flex-col justify-between gap-4 border-b border-slate-200 pb-6 md:flex-row md:items-center">
           <div>
             <h1 className="text-2xl font-black tracking-tight text-slate-800 sm:text-3xl">
@@ -42,49 +48,21 @@ export function CheckoutDesign({
         </div>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-          {/* بخش اطلاعات ارسال و پرداخت */}
+          {/* Main Delivery & Shipping Information */}
           <div className="space-y-6 lg:col-span-8">
-            {/* آدرس تحویل */}
-            <div className="group relative overflow-hidden rounded-[2.5rem] border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
-              <div className="absolute -right-12 -top-12 h-24 w-24 rounded-full bg-blue-50 transition-transform group-hover:scale-110"></div>
+            
+            {/* 
+              CALL ADDRESS COMPONENT HERE:
+              Here we call the CheckoutAddressLogic component. It handles state, 
+              fetches addresses from the API using your `useFetch` hook, and 
+              automatically manages address selection without cluttering this view.
+            */}
+            <CheckoutAddressLogic
+              selectedAddressId={selectedAddressId}
+              onSelectAddress={onSelectAddress}
+            />
 
-              <div className="relative mb-6 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-2xl bg-blue-600 p-3 text-white shadow-lg shadow-blue-200">
-                    <MapPin className="h-6 w-6" />
-                  </div>
-                  <h2 className="text-xl font-extrabold text-slate-800">آدرس تحویل سفارش</h2>
-                </div>
-
-                <button className="flex items-center gap-1 text-sm font-bold text-blue-600 hover:underline">
-                  تغییر آدرس
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-              </div>
-
-              <div className="relative grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div className="rounded-3xl border border-slate-100 bg-slate-50/50 p-5">
-                  <p className="mb-1 text-xs font-bold text-slate-400">نشانی دقیق:</p>
-                  <p className="font-medium leading-relaxed text-slate-700">
-                    تهران، محله سعادت‌آباد، خیابان سرو غربی، پلاک ۲۴، واحد ۱۲
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="rounded-3xl border border-slate-100 bg-slate-50/50 p-4 text-center">
-                    <p className="mb-1 text-xs font-bold text-slate-400">تحویل گیرنده:</p>
-                    <p className="font-bold text-slate-700">محمد علوی</p>
-                  </div>
-
-                  <div className="rounded-3xl border border-slate-100 bg-slate-50/50 p-4 text-center">
-                    <p className="mb-1 text-xs font-bold text-slate-400">شماره تماس:</p>
-                    <p className="font-bold text-slate-700">۰۹۱۲۰۰۰۰۰۰۰</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* زمان و نحوه ارسال */}
+            {/* Delivery Methods */}
             <div className="rounded-[2.5rem] border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
               <div className="mb-8 flex items-center gap-3">
                 <div className="rounded-2xl bg-blue-600 p-3 text-white shadow-lg shadow-blue-200">
@@ -128,7 +106,7 @@ export function CheckoutDesign({
               </div>
             </div>
 
-            {/* روش پرداخت */}
+            {/* Payment Method */}
             <div className="rounded-[2.5rem] border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
               <div className="mb-8 flex items-center gap-3">
                 <div className="rounded-2xl bg-blue-600 p-3 text-white shadow-lg shadow-blue-200">
@@ -153,7 +131,7 @@ export function CheckoutDesign({
             </div>
           </div>
 
-          {/* فاکتور */}
+          {/* Invoice Summary */}
           <CheckoutInvoiceCard
             cartItems={cartItems}
             subtotal={subtotal}
