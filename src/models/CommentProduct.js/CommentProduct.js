@@ -20,7 +20,7 @@ const CommentProductSchema = new mongoose.Schema(
     },
     isApproved: {
       type: Boolean,
-      default: false, // کامنت‌ها در ابتدا نیاز به تایید ادمین دارند
+      default: false,   
     },
   },
   {

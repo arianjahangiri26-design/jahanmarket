@@ -1,40 +1,57 @@
+// src/models/order.js
 import mongoose from "mongoose";
 
 const OrderSchema = new mongoose.Schema(
   {
+    // The user who placed the order
     user: {
       type: mongoose.Schema.Types.ObjectId,
-
-      required: [true, "نام الزامی است"],
       ref: "User",
-      required: true,
-
+      required: [true, "کاربر الزامی است"],
     },
+    // The selected delivery address
+    address: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Address",
+      required: [true, "آدرس تحویل سفارش الزامی است"],
+    },
+    // List of ordered products
     items: [
       {
         product: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Product",
-          required: true
+          required: true,
         },
         quantity: {
           type: Number,
           min: 1,
-          required: true
-        }
-
-
-      }],
-
-    discountPrice: { type: Number, default: 0, },
-    totalPrice: { type: Number, require: true },
-    finalPrice: { type: Number, require: true },
+          required: true,
+        },
+        price: {
+          type: Number,
+          required: true,
+        },
+      },
+    ],
+    discountPrice: {
+      type: Number,
+      default: 0,
+    },
+    totalPrice: {
+      type: Number,
+      required: true,
+    },
+    finalPrice: {
+      type: Number,
+      required: true,
+    },
     status: {
       type: String,
-      require: true,
-
-      enum: ["در انتظار پرداخت", "پرداخت شده", "لغو شده"]
-    }
+      required: true,
+      enum: ["در انتظار پرداخت", "پرداخت شده", "لغو شده"],
+      default: "در انتظار پرداخت",
+    },
   },
   {
     timestamps: true,

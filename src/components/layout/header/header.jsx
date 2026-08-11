@@ -79,7 +79,7 @@ const Header = () => {
                 سبد خرید
               </span>
               {totalItems > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-gradient-to-br from-[#0B3C5D] to-[#07263D] px-1 text-[11px] font-black text-white shadow-sm">
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-gradient-to-br from-[#509cff] to-[#0072ca] px-1 text-[13px] font-black text-white shadow-sm">
                   {totalItems}
                 </span>
               )}

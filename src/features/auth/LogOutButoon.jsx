@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FiLogOut } from "react-icons/fi";
 import { signOut, useSession } from "next-auth/react";
+import { toast } from "@heroui/react";
 
 export const LogOutButton = ({ children, className = "" }) => {
   const { status } = useSession();
@@ -12,8 +13,16 @@ export const LogOutButton = ({ children, className = "" }) => {
     try {
       setIsLoading(true);
       await signOut({ callbackUrl: "/" });
+
+  toast.success("نظر شما با موفقیت ثبت شد", {
+  description: "پس از تأیید مدیر، دیدگاه شما در صفحه محصول نمایش داده خواهد شد.",
+});
+
+
     } catch (error) {
-      console.error("Logout error:", error);
+   toast.danger("خروج از حساب با خطا مواجه شد", {
+description: "لطفاً دوباره تلاش کنید یا در صورت تداوم مشکل با پشتیبانی تماس بگیرید.",
+});
       setIsLoading(false);
     }
   };

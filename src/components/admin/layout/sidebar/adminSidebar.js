@@ -7,35 +7,82 @@ import { Avatar, Chip } from "@heroui/react";
 import { FiChevronDown } from "react-icons/fi";
 import { adminMenu } from "@/constants/admin/layout/sidebar/sidebarConstants";
 
-function isChildActive(children, pathname) {
-  if (!children?.length) return false;
+function isExactActive(pathname, href) {
+  return pathname === href;
+}
+
+function hasActiveChild(children = [], pathname) {
   return children.some((child) => pathname === child.href);
+}
+
+function MenuIconBox({ Icon, active }) {
+  return (
+    <div
+      className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all ${
+        active
+          ? "bg-blue-500/20 text-blue-300"
+          : "bg-white/5 text-slate-400 group-hover:bg-white/10 group-hover:text-white"
+      }`}
+    >
+      <Icon size={18} />
+    </div>
+  );
+}
+
+function MenuText({ title, description }) {
+  return (
+    <div className="flex flex-col">
+      <span className="text-sm font-medium">{title}</span>
+      {description && (
+        <span className="text-[11px] text-slate-400">{description}</span>
+      )}
+    </div>
+  );
+}
+
+function ChildLink({ sub, active }) {
+  return (
+    <Link
+      href={sub.href}
+      className={`group flex items-center justify-between rounded-xl px-3 py-2.5 text-sm transition-all ${
+        active
+          ? "bg-blue-500/15 font-medium text-blue-300"
+          : "text-slate-400 hover:bg-white/5 hover:text-white"
+      }`}
+    >
+      <span>{sub.title}</span>
+      <span
+        className={`h-2 w-2 rounded-full transition-all ${
+          active
+            ? "bg-blue-400 shadow-[0_0_12px_rgba(96,165,250,0.8)]"
+            : "bg-slate-600 group-hover:bg-slate-300"
+        }`}
+      />
+    </Link>
+  );
 }
 
 export default function AdminSidebar() {
   const pathname = usePathname();
-  const [openMenus, setOpenMenus] = useState({});
+  const [manualOpen, setManualOpen] = useState({});
 
-  const initialOpenMenus = useMemo(() => {
-    const opened = {};
-    adminMenu.forEach((item) => {
+  const autoOpenMenus = useMemo(() => {
+    return adminMenu.reduce((acc, item) => {
       if (item.children?.length) {
-        opened[item.title] = isChildActive(item.children, pathname);
+        acc[item.title] = hasActiveChild(item.children, pathname);
       }
-    });
-    return opened;
+      return acc;
+    }, {});
   }, [pathname]);
 
-  const mergedOpenMenus = { ...initialOpenMenus, ...openMenus };
+  const openMenus = { ...autoOpenMenus, ...manualOpen };
 
   const toggleMenu = (title) => {
-    setOpenMenus((prev) => ({
+    setManualOpen((prev) => ({
       ...prev,
-      [title]: !mergedOpenMenus[title],
+      [title]: !openMenus[title],
     }));
   };
-
-  const isItemActive = (href) => pathname === href;
 
   return (
     <aside className="flex h-screen w-72 flex-col border-l border-white/10 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-200 shadow-2xl">
@@ -67,8 +114,8 @@ export default function AdminSidebar() {
         </div>
       </div>
 
-      {/* Title */}
-      <div className="px-4 pt-4 pb-2">
+      {/* Navigation Title */}
+      <div className="px-4 pb-2 pt-4">
         <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2">
           <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-400">
             Dashboard Navigation
@@ -80,109 +127,42 @@ export default function AdminSidebar() {
       <nav className="flex-1 space-y-2 overflow-y-auto px-3 py-3 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10">
         {adminMenu.map((item) => {
           const Icon = item.icon;
-          const hasChildren = !!item.children?.length;
-          const parentActive = hasChildren
-            ? isChildActive(item.children, pathname)
-            : isItemActive(item.href);
+          const hasChildren = Boolean(item.children?.length);
+          const active = hasChildren
+            ? hasActiveChild(item.children, pathname)
+            : isExactActive(pathname, item.href);
+
+          if (!hasChildren) {
+            return (
+              <Link
+                key={item.title}
+                href={item.href}
+                className={`group flex items-center gap-3 rounded-2xl px-3 py-3 transition-all duration-200 ${
+                  active
+                    ? "bg-blue-600/15 text-white ring-1 ring-blue-400/20"
+                    : "text-slate-300 hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                <MenuIconBox Icon={Icon} active={active} />
+                <MenuText title={item.title} description={item.description} />
+              </Link>
+            );
+          }
 
           return (
             <div key={item.title} className="space-y-1">
-              {hasChildren ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => toggleMenu(item.title)}
-                    className={`group flex w-full items-center justify-between rounded-2xl px-3 py-3 text-right transition-all duration-200 ${
-                      parentActive
-                        ? "bg-blue-600/15 text-white ring-1 ring-blue-400/20"
-                        : "text-slate-300 hover:bg-white/5 hover:text-white"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all ${
-                          parentActive
-                            ? "bg-blue-500/20 text-blue-300"
-                            : "bg-white/5 text-slate-400 group-hover:bg-white/10 group-hover:text-white"
-                        }`}
-                      >
-                        <Icon size={18} />
-                      </div>
-
-                      <div className="flex flex-col items-start">
-                        <span className="text-sm font-medium">{item.title}</span>
-                        {item.description && (
-                          <span className="text-[11px] text-slate-400">
-                            {item.description}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <FiChevronDown
-                      className={`shrink-0 transition-transform duration-300 ${
-                        mergedOpenMenus[item.title] ? "rotate-180" : ""
-                      }`}
-                      size={18}
-                    />
-                  </button>
-
-                  <div
-                    className={`overflow-hidden transition-all duration-300 ${
-                      mergedOpenMenus[item.title]
-                        ? "max-h-96 opacity-100"
-                        : "max-h-0 opacity-0"
-                    }`}
-                  >
-                    <div className="mr-5 mt-1 space-y-1 border-r border-white/10 pr-3">
-                      {item.children.map((sub) => {
-                        const subActive = pathname === sub.href;
-
-                        return (
-                          <Link
-                            key={sub.title}
-                            href={sub.href}
-                            className={`group flex items-center justify-between rounded-xl px-3 py-2.5 text-sm transition-all ${
-                              subActive
-                                ? "bg-blue-500/15 font-medium text-blue-300"
-                                : "text-slate-400 hover:bg-white/5 hover:text-white"
-                            }`}
-                          >
-                            <span>{sub.title}</span>
-
-                            <span
-                              className={`h-2 w-2 rounded-full transition-all ${
-                                subActive
-                                  ? "bg-blue-400 shadow-[0_0_12px_rgba(96,165,250,0.8)]"
-                                  : "bg-slate-600 group-hover:bg-slate-300"
-                              }`}
-                            />
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <Link
-                  href={item.href}
-                  className={`group flex items-center gap-3 rounded-2xl px-3 py-3 transition-all duration-200 ${
-                    parentActive
-                      ? "bg-blue-600/15 text-white ring-1 ring-blue-400/20"
-                      : "text-slate-300 hover:bg-white/5 hover:text-white"
-                  }`}
-                >
-                  <div
-                    className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all ${
-                      parentActive
-                        ? "bg-blue-500/20 text-blue-300"
-                        : "bg-white/5 text-slate-400 group-hover:bg-white/10 group-hover:text-white"
-                    }`}
-                  >
-                    <Icon size={18} />
-                  </div>
-
-                  <div className="flex flex-col">
+              <button
+                type="button"
+                onClick={() => toggleMenu(item.title)}
+                className={`group flex w-full items-center justify-between rounded-2xl px-3 py-3 text-right transition-all duration-200 ${
+                  active
+                    ? "bg-blue-600/15 text-white ring-1 ring-blue-400/20"
+                    : "text-slate-300 hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <MenuIconBox Icon={Icon} active={active} />
+                  <div className="flex flex-col items-start">
                     <span className="text-sm font-medium">{item.title}</span>
                     {item.description && (
                       <span className="text-[11px] text-slate-400">
@@ -190,8 +170,33 @@ export default function AdminSidebar() {
                       </span>
                     )}
                   </div>
-                </Link>
-              )}
+                </div>
+
+                <FiChevronDown
+                  size={18}
+                  className={`shrink-0 transition-transform duration-300 ${
+                    openMenus[item.title] ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              <div
+                className={`overflow-hidden transition-all duration-300 ${
+                  openMenus[item.title]
+                    ? "max-h-96 opacity-100"
+                    : "max-h-0 opacity-0"
+                }`}
+              >
+                <div className="mr-5 mt-1 space-y-1 border-r border-white/10 pr-3">
+                  {item.children.map((sub) => (
+                    <ChildLink
+                      key={sub.title}
+                      sub={sub}
+                      active={pathname === sub.href}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           );
         })}

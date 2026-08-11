@@ -2,6 +2,7 @@
 
 import HeroBannerLogic from "@/components/main/banner/hero-banner/logic/HeroBannerLogic";
 import ByCategoriesLogic from "@/components/main/by-category/ByCategoryLogic";
+import { SoldProductsLogic } from "@/components/main/by-sold-products/logic/SoldProductsLogic";
 import ProductShowcaseLogic from "@/components/main/product/showcase/logic/ProductShowcaseLogic";
 
  
@@ -29,6 +30,7 @@ export default function HomePage() {
             href="/products"
           />
         </div>
+        <SoldProductsLogic/>
       </div>
     </section>
   );

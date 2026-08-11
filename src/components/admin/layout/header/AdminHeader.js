@@ -65,15 +65,12 @@ function getCurrentPage(pathname) {
 
 export default function AdminHeader({ onOpenSidebar }) {
   const pathname = usePathname();
-
   const currentPage = useMemo(() => getCurrentPage(pathname), [pathname]);
 
   return (
     <header className="sticky top-0 z-40 h-20 border-b border-slate-200/70 bg-white/80 px-4 shadow-sm backdrop-blur-xl lg:px-6">
       <div className="flex h-full items-center justify-between gap-4">
-        {/* Right Side / Page Info */}
         <div className="flex min-w-0 items-center gap-3">
-          {/* Mobile Sidebar Button */}
           <button
             type="button"
             onClick={onOpenSidebar}
@@ -100,24 +97,9 @@ export default function AdminHeader({ onOpenSidebar }) {
           </div>
         </div>
 
-        {/* Left Side / Actions */}
         <div className="flex items-center gap-3">
-          {/* Search */}
-          <div className="hidden md:block">
-            <Input
-              type="search"
-              placeholder="جستجو در پنل..."
-              startContent={<FiSearch className="text-slate-400" size={18} />}
-              className="w-72"
-              classNames={{
-                inputWrapper:
-                  "h-11 rounded-2xl border border-slate-200 bg-slate-50/80 shadow-none transition-all hover:border-blue-200 focus-within:!border-blue-400 focus-within:!bg-white",
-                input: "text-sm text-slate-700 placeholder:text-slate-400",
-              }}
-            />
-          </div>
+        
 
-          {/* Settings */}
           <Tooltip content="تنظیمات" placement="bottom">
             <button
               type="button"
@@ -127,7 +109,6 @@ export default function AdminHeader({ onOpenSidebar }) {
             </button>
           </Tooltip>
 
-          {/* Notifications */}
           <Tooltip content="اعلان‌ها" placement="bottom">
             <button
               type="button"
@@ -142,7 +123,6 @@ export default function AdminHeader({ onOpenSidebar }) {
             </button>
           </Tooltip>
 
-          {/* Profile */}
           <button
             type="button"
             className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-1.5 pl-3 shadow-sm transition-all hover:border-blue-200 hover:bg-blue-50/60"

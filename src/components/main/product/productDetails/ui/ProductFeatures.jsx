@@ -1,25 +1,51 @@
-// src/components/product/ProductFeatures.js
+import { FaCheckCircle } from "react-icons/fa";
 
 export default function ProductFeatures({ features = [] }) {
-  if (!features.length) return null;
+  if (!Array.isArray(features) || features.length === 0) return null;
 
   return (
-    <div className="mt-8 rounded-[32px] border border-blue-100 bg-white p-6 shadow-lg shadow-blue-100/40">
-      <h2 className="mb-6 text-2xl font-extrabold text-slate-800">
-        ویژگی‌های محصول
-      </h2>
+    <section className="mt-10 rounded-[32px] border border-blue-100 bg-white p-5 shadow-xl shadow-blue-100/30 sm:p-7">
+      {/* Section header */}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-5">
+        <div>
+          <h2 className="text-xl font-black text-slate-800 sm:text-2xl">
+            ویژگی‌های محصول
+          </h2>
+          <p className="mt-2 text-sm leading-7 text-slate-500">
+            مشخصات اصلی این محصول را می‌توانید در این بخش مشاهده کنید.
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="rounded-full bg-blue-50 px-4 py-2 text-xs font-bold text-blue-700">
+          {features.length} ویژگی
+        </div>
+      </div>
+
+      {/* Features list */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {features.map((item, index) => (
           <div
-            key={index}
-            className="flex justify-between rounded-2xl bg-gradient-to-br from-blue-50 to-white px-4 py-3 shadow-sm"
+            key={`${item?.key || "feature"}-${index}`}
+            className="group rounded-[24px] border border-blue-100 bg-gradient-to-br from-blue-50/80 via-white to-cyan-50/70 p-4 transition duration-200 hover:-translate-y-1 hover:shadow-md hover:shadow-blue-100/40"
           >
-            <span className="text-slate-500 text-sm">{item.key}</span>
-            <span className="font-semibold text-slate-800">{item.value}</span>
+            <div className="flex items-start gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-blue-600 shadow-sm">
+                <FaCheckCircle className="text-base" />
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-slate-500">
+                  {item?.key || "ویژگی"}
+                </p>
+
+                <p className="mt-2 break-words text-sm font-black leading-7 text-slate-800 sm:text-base">
+                  {item?.value || "-"}
+                </p>
+              </div>
+            </div>
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

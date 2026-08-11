@@ -3,8 +3,9 @@
 import { useFetch } from "@/hooks/crud/UseCrud";
 import CommentForm from "./CommentForm";
 import FormProvider from "@/context/form/FormProvider";
-import { addToast } from "@heroui/toast"; // استفاده از متد ثبت توست HeroUI
+import { toast } from "@heroui/react";
 
+ 
 export default function CommentFormLogic({ productId, comments = [] }) {
   const { request, loading } = useFetch(null);
 
@@ -32,7 +33,7 @@ export default function CommentFormLogic({ productId, comments = [] }) {
       });
       
       // نمایش توست خطا با استایل HeroUI
-      addToast({
+      toast.warning({
         title: "خطا در ثبت",
         description: result.error || "ثبت نظر با خطا مواجه شد.",
         variant: "flat",
@@ -42,17 +43,10 @@ export default function CommentFormLogic({ productId, comments = [] }) {
     }
 
     // نمایش توست موفقیت با استایل سرمه‌ای/آجری (Custom Style)
-    addToast({
-      title: "با موفقیت ثبت شد",
-      description: result.message || "نظر شما پس از تایید نمایش داده می‌شود.",
-      variant: "flat",
-      color: "success",
-      classNames: {
-        base: "bg-white border-r-4 border-[#0B3C5D]", // نوار سرمه‌ای کنار توست
-        title: "text-[#0A2540] font-bold",
-        description: "text-[#627D98] text-xs",
-      }
-    });
+   toast.success("نظر شما با موفقیت ثبت شد", {
+  description: "پس از تأیید مدیر، دیدگاه شما در صفحه محصول نمایش داده خواهد شد.",
+});
+
     
     reset({
       text: "",

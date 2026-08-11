@@ -1,10 +1,7 @@
-import { registerSendOtpSchema } from "@/lib/validators/auth/auth.schema"
-
- 
+import OtpForm from "@/features/auth/otp-verify/OtpForm";
  
 
-  
-registerSendOtpSchema
+ 
    
   
   
@@ -12,17 +9,9 @@ registerSendOtpSchema
   
   return (
       <div>
-      <FormProvider
-    schema={se}
-    defaultValues={{
-      name: "",
-      email: "",
-      phoneNumber: "",
-      code: "",
-    }}
-  >
+
    <OtpForm /> 
-  </FormProvider>
+ 
   
       </div>
   )

@@ -1,40 +1,65 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { toast } from "@heroui/react";
 
 export function useOtpTimer(initialTime = 120, onResend) {
   const [timer, setTimer] = useState(initialTime);
   const [canResend, setCanResend] = useState(false);
+  const intervalRef = useRef(null);
 
-  useEffect(() => {
-    if (timer <= 0) {
-      setCanResend(true);
-      return;
+  const stop = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
     }
+  }, []);
 
-    setCanResend(false);
-
-    const interval = setInterval(() => {
+  const start = useCallback(() => {
+    stop(); // خیلی مهم: قبلش قبلی رو ببند که دوتا نشه
+    intervalRef.current = setInterval(() => {
       setTimer((prev) => {
         if (prev <= 1) {
-          clearInterval(interval);
+          stop();
+          setCanResend(true);
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
+  }, [stop]);
 
-    return () => clearInterval(interval);
-  }, [timer]);
+  
+  useEffect(() => {
+    setTimer(initialTime);
+    setCanResend(false);
+    start();
+
+    return stop;
+  }, [initialTime, start, stop]);
 
   const restartTimer = useCallback(async () => {
     if (!canResend) return;
 
-    if (typeof onResend === "function") {
-      await onResend();
-    }
+    try {
+      if (typeof onResend === "function") {
+        await onResend();
+      }
 
-    setTimer(initialTime);
-    setCanResend(false);
-  }, [canResend, onResend, initialTime]);
+      toast.success("کد تأیید ارسال شد", {
+        description: "اگر پیامک را دریافت نکردید، چند لحظه بعد دوباره تلاش کنید.",
+      });
+
+      setTimer(initialTime);
+      setCanResend(false);
+      start();
+    } catch (err) {
+      toast.error("ارسال کد تأیید ناموفق بود", {
+        description: "لطفاً دوباره تلاش کنید. در صورت تداوم مشکل، اینترنت یا شماره را بررسی کنید.",
+      });
+
+      
+       setCanResend(true);
+    }
+  }, [canResend, onResend, initialTime, start]);
 
   const formatTime = useCallback(() => {
     const mins = Math.floor(timer / 60);

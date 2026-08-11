@@ -1,10 +1,11 @@
 "use client"
 
- 
- 
-import UsersListLogic from "@/components/admin/users/get-users/GetUsers";
- 
+import UsersListLogic from "@/components/admin/users/get/GetUsers";
 
+ 
+ 
+ 
+ 
  
 
 
