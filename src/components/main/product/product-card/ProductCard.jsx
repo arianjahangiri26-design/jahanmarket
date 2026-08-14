@@ -36,7 +36,9 @@ function isFreshProduct(createdAt, days = 3) {
 }
 
 export default function ProductCard({ product }) {
-  if (!product?.isActive) return null;
+  if (!product) return null;
+
+  const isOutOfStock = (product?.stock ?? 0) <= 0;
 
   const id = product?._id || product?.id || "";
   const title = product?.title || product?.name || "محصول بدون نام";
@@ -77,7 +79,7 @@ export default function ProductCard({ product }) {
   return (
     <Link
       href={href}
-      className="group relative mx-auto flex h-full w-full max-w-[320px] flex-col overflow-hidden rounded-[32px] border border-[#D9E7F5] bg-white shadow-[0_12px_45px_-15px_rgba(11,60,93,0.08)] transition-all duration-500 hover:-translate-y-2 hover:border-[#93C5FD]/60 hover:shadow-[0_24px_60px_-15px_rgba(11,60,93,0.16)]"
+      className={`group relative mx-auto flex h-full w-full max-w-[320px] flex-col overflow-hidden rounded-[32px] border border-[#D9E7F5] bg-white shadow-[0_12px_45px_-15px_rgba(11,60,93,0.08)] transition-transform duration-300 hover:scale-[1.02] ${isOutOfStock ? "opacity-60" : ""}`}
     >
       <div className="relative p-4 pb-0">
         {/* Blue gradient media area */}
@@ -98,6 +100,15 @@ export default function ProductCard({ product }) {
               </span>
             )}
           </div>
+
++          {/* Out of stock badge */}
++          {isOutOfStock && (
++            <div className="absolute left-4 top-4 z-30">
++              <span className="rounded-full bg-gray-200 px-3 py-1 text-[12px] font-bold text-gray-700">
++                ناموجود
++              </span>
++            </div>
++          )}
 
           <div className="relative h-[240px] w-full overflow-hidden rounded-[20px]">
             <Image
@@ -142,7 +153,13 @@ export default function ProductCard({ product }) {
 
             <button
               type="button"
-              className="flex h-12 w-12 items-center justify-center rounded-[20px] bg-blue-600 text-white shadow-md shadow-[#0B3C5D]/20 transition-all duration-300 hover:bg-sky-500 hover:shadow-lg hover:shadow-[#0B3C5D]/30 active:scale-95"
+              disabled={isOutOfStock}
+              aria-disabled={isOutOfStock}
+              className={`flex h-12 w-12 items-center justify-center rounded-[20px] text-white shadow-md transition-all duration-300 ${
+                isOutOfStock
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed shadow-none"
+                  : "bg-blue-600 hover:bg-sky-500 hover:shadow-lg"
+              }`}
               aria-label="Add to cart"
             >
               <HiOutlineShoppingBag className="text-[22px]" />
