@@ -7,9 +7,10 @@ import { useRouter } from "next/navigation";
 
 import { useFetch } from "@/hooks/crud/UseCrud";
 import Logindesign from "../design/FormLogin";
-   import { useFormContext } from "react-hook-form";
+   import { FormProvider, useFormContext } from "react-hook-form";
 
 import { sendOtpSchema, loginSchema } from "@/lib/validators/auth/auth.schema";
+ 
 
 function LoginContent() {
   const [step, setStep] = useState(1);
@@ -118,6 +119,12 @@ setServerError(
   };
 
   return (
+    <FormProvider
+      defaultValues= {{
+      identifier: "",
+      code: "",
+    }}
+    >
     <div>
       {step === 1 && (
         <Logindesign
@@ -136,6 +143,7 @@ setServerError(
         />
       )}
     </div>
+    </FormProvider>
   );
 }
 

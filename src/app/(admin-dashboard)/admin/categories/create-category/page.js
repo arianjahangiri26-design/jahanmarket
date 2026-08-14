@@ -1,6 +1,6 @@
-import CreateCategoryLogic from '@/components/admin/Category/create-category/createCategory';
+import CreateCategoryLogic from "@/components/admin/Category/create/createCategory";
+
  
-import React from 'react'
 
     const  CreateCategory = () => {
         return (

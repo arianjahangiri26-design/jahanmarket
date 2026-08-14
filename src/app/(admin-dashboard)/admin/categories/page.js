@@ -1,8 +1,6 @@
+ 
 
-
-import CategoriesListLogic from '@/components/admin/Category/get-category/GetCategory';
-
-
+import CategoriesListLogic from '@/components/admin/Category/get/GetCategory';
 import React from 'react'
 
 const CategoryList = () => {
