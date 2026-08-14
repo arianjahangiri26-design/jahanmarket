@@ -1,168 +1,148 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { LucideAlertCircle, SearchX, X } from "lucide-react";
-import ProductCard from "../../product/product-card/ProductCard";
-import SortBar from "../filter-product/ui/sortBar";
-import SideFilterBar from "../filter-product/ui/sideFilterBar";
+import { useRef } from "react";
+import Link from "next/link";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay } from "swiper/modules";
+import { HiOutlineChevronLeft, HiOutlineChevronRight, HiOutlineEye } from "react-icons/hi";
+import { AiOutlineProduct } from "react-icons/ai";
+import { BiGridAlt } from "react-icons/bi";
+import ProductCard from "@/components/product/product-card/ProductCard";
 
-export default function FetchCategoryProductsDesign({
-  products = [],
-  productsError = null,
-  categoriesError = null,
-  sortBy,
-  setSortBy,
-  selectedCategory,
-  setSelectedCategory,
-  categories = [],
-  priceRange,
-  setPriceRange,
-  searchQuery = "",
-}) {
-  const router = useRouter();
+import "swiper/css";
 
-  const hasSearchQuery = Boolean(String(searchQuery).trim());
-  const hasError = Boolean(productsError || categoriesError);
+/**
+ * Presentational component for rendering sold products.
+ * A single section wrapper holds: loading skeleton, empty state and the slider.
+ */
+export function SoldProductsDesign({ products = [], loading }) {
+  const swiperRef = useRef(null);
 
-  const handleClearSearch = () => {
-    router.push("/categories/all");
-  };
-
-  if (hasError) {
-    return (
-      <section className="my-8 md:my-10" dir="rtl">
-        <div className="overflow-hidden rounded-[32px] border border-[#D9E7F5] bg-white shadow-[0_18px_50px_-20px_rgba(11,60,93,0.18)]">
-          <div className="bg-[linear-gradient(135deg,#F8FBFF_0%,#EEF6FD_55%,#FFFFFF_100%)] px-6 py-6 sm:px-8">
-            <div className="flex min-h-[320px] flex-col items-center justify-center text-center">
-              <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-[#CFE0F2] bg-[#EDF5FC] shadow-sm">
-                <LucideAlertCircle className="h-8 w-8 text-[#0B3C5D]" />
-              </div>
-
-              <h2 className="text-lg font-black text-[#0A2540]">
-                دریافت اطلاعات با خطا مواجه شد
-              </h2>
-
-              <p className="mt-3 max-w-md text-sm leading-7 text-[#627D98]">
-                {productsError ||
-                  categoriesError ||
-                  "لطفاً دوباره تلاش کنید."}
-              </p>
-
-              <button
-                type="button"
-                onClick={() => window.location.reload()}
-                className="mt-6 rounded-2xl bg-[#0B3C5D] px-6 py-3 text-sm font-bold text-white shadow-[0_12px_30px_-12px_rgba(11,60,93,0.45)] transition-all duration-300 hover:bg-[#07263D] hover:shadow-[0_18px_35px_-12px_rgba(11,60,93,0.5)]"
-              >
-                تلاش مجدد
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  // True when data is loaded but there is nothing to show.
+  const isEmpty = !loading && !products.length;
 
   return (
-    <section
-      className="my-8 bg-[linear-gradient(180deg,#F8FBFF_0%,#F4F9FD_45%,#FFFFFF_100%)] py-1 md:my-10"
-      dir="rtl"
-    >
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 xl:gap-8">
-        <aside className="lg:col-span-3">
-          <div className="sticky top-24">
-            <div className="rounded-[30px] border border-[#D9E7F5] bg-white/95 p-1 shadow-[0_18px_50px_-24px_rgba(11,60,93,0.16)] backdrop-blur-sm">
-              <SideFilterBar
-                selectedCategory={selectedCategory}
-                setSelectedCategory={setSelectedCategory}
-                categories={categories}
-                priceRange={priceRange}
-                setPriceRange={setPriceRange}
-              />
-            </div>
-          </div>
-        </aside>
+    <section className="py-10 sm:py-12" dir="rtl">
+      <div className="mx-auto max-w-[1550px] px-4 sm:px-6 lg:px-8">
+        <div className="overflow-hidden rounded-[36px] border border-blue-100 bg-white shadow-sm">
+          {/* Top accent */}
+          <div className="h-1 bg-blue-600" />
 
-        <div className="space-y-5 lg:col-span-9">
-          {hasSearchQuery && (
-            <div className="overflow-hidden rounded-[28px] border border-[#D9E7F5] bg-white shadow-[0_14px_40px_-20px_rgba(11,60,93,0.14)]">
-              <div className="flex flex-col gap-4 bg-[linear-gradient(135deg,#F8FBFF_0%,#EEF6FD_55%,#FFFFFF_100%)] px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-                <div>
-                  <p className="text-sm text-[#486581]">
-                    نتایج جستجو برای:
-                    <span className="mr-1 font-black text-[#0B3C5D]">
-                      «{searchQuery}»
-                    </span>
-                  </p>
-
-                  <p className="mt-1 text-xs font-medium text-[#7B93AA]">
-                    {products.length.toLocaleString("fa-IR")} محصول پیدا شد
-                  </p>
+          <div className="p-5 sm:p-8 lg:p-10">
+            {/* Section header */}
+            <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+              <div>
+                <div className="mb-4 inline-flex items-center gap-3 rounded-full bg-blue-50 px-4 py-2 text-sm font-bold text-blue-600">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white">
+                    <AiOutlineProduct />
+                  </span>
+                  پرفروش‌ترین محصولات
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleClearSearch}
-                  className="inline-flex items-center justify-center gap-1.5 self-start rounded-2xl border border-[#CFE0F2] bg-white px-4 py-2.5 text-xs font-bold text-[#0B3C5D] transition-all duration-300 hover:border-[#A9C7E6] hover:bg-[#F4F9FD] hover:text-[#07263D] sm:self-auto"
-                >
-                  <X className="h-4 w-4" />
-                  حذف جستجو
-                </button>
-              </div>
-            </div>
-          )}
-
-          <div className="rounded-[28px] border border-[#D9E7F5] bg-white/95 p-1 shadow-[0_14px_40px_-24px_rgba(11,60,93,0.14)] backdrop-blur-sm">
-            <SortBar
-              sortBy={sortBy}
-              setSortBy={setSortBy}
-              totalProducts={products.length}
-            />
-          </div>
-
-          {products.length === 0 ? (
-            <div className="overflow-hidden rounded-[32px] border border-[#D9E7F5] bg-white shadow-[0_18px_50px_-20px_rgba(11,60,93,0.16)]">
-              <div className="flex min-h-[320px] flex-col items-center justify-center bg-[linear-gradient(180deg,#FFFFFF_0%,#F5FAFF_100%)] p-10 text-center">
-                <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-[#CFE0F2] bg-[#EDF5FC] shadow-sm">
-                  {hasSearchQuery ? (
-                    <SearchX className="h-8 w-8 text-[#0B3C5D]" />
-                  ) : (
-                    <LucideAlertCircle className="h-8 w-8 text-[#0B3C5D]" />
-                  )}
-                </div>
-
-                <h2 className="text-lg font-black text-[#0A2540]">
-                  محصولی پیدا نشد
+                <h2 className="text-2xl font-black text-slate-800 sm:text-3xl">
+                  محبوب‌ترین انتخاب‌های مشتریان
                 </h2>
 
-                <p className="mt-3 max-w-md text-sm leading-7 text-[#627D98]">
-                  {hasSearchQuery
-                    ? `برای عبارت «${searchQuery}» محصولی یافت نشد. نام محصول را بررسی کرده و دوباره جستجو کنید.`
-                    : "محصولی با فیلترهای انتخاب‌شده وجود ندارد. فیلترها را تغییر دهید."}
+                <p className="mt-3 text-sm text-slate-500 sm:text-base">
+                  محصولات برتر فروشگاه بر اساس تعداد فروش
                 </p>
-
-                {hasSearchQuery && (
-                  <button
-                    type="button"
-                    onClick={handleClearSearch}
-                    className="mt-6 rounded-2xl bg-[#0B3C5D] px-6 py-3 text-sm font-bold text-white shadow-[0_12px_30px_-12px_rgba(11,60,93,0.45)] transition-all duration-300 hover:bg-[#07263D] hover:shadow-[0_18px_35px_-12px_rgba(11,60,93,0.5)]"
-                  >
-                    مشاهده همه محصولات
-                  </button>
-                )}
               </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-              {products.map((product, index) => (
-                <div
-                  key={product?._id || product?.id || index}
-                  className="transition-transform duration-300 hover:-translate-y-1"
+
+              {/* "View all" link is only useful when there are products */}
+              {!isEmpty && (
+                <Link
+                  href="/products"
+                  className="group inline-flex w-fit items-center gap-2 rounded-2xl border border-blue-100 px-5 py-3 text-sm font-bold text-blue-600 transition hover:border-blue-500 hover:bg-blue-50"
                 >
-                  <ProductCard product={product} />
-                </div>
-              ))}
+                  <HiOutlineEye className="text-xl" />
+                  مشاهده همه محصولات
+                  <HiOutlineChevronLeft className="transition group-hover:-translate-x-1" />
+                </Link>
+              )}
             </div>
-          )}
+
+            {/* Body — always rendered inside the same section */}
+            {loading ? (
+              /* Loading skeleton */
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <div key={index} className="rounded-[26px] border border-blue-100 p-4">
+                    <div className="aspect-square animate-pulse rounded-[20px] bg-blue-50" />
+                    <div className="mt-4 h-4 animate-pulse rounded-full bg-slate-100" />
+                    <div className="mt-3 h-3 w-20 animate-pulse rounded-full bg-blue-50" />
+                  </div>
+                ))}
+              </div>
+            ) : isEmpty ? (
+              /* Empty state */
+              <div className="rounded-[32px] border-2 border-dashed border-blue-100 bg-blue-50/30 px-5 py-16 text-center">
+                <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl bg-blue-100 text-blue-500">
+                  <BiGridAlt className="text-4xl" />
+                </div>
+
+                <h3 className="text-xl font-black text-slate-800 sm:text-2xl">
+                  هنوز محصولی برای نمایش وجود ندارد
+                </h3>
+
+                <p className="mt-3 text-sm leading-7 text-slate-500 sm:text-base">
+                  پرفروش‌ترین محصولات پس از دریافت اطلاعات نمایش داده می‌شوند.
+                </p>
+              </div>
+            ) : (
+              /* Products slider */
+              <div className="relative">
+                <Swiper
+                  ref={swiperRef}
+                  dir="rtl"
+                  modules={[Autoplay]}
+                  spaceBetween={20}
+                  slidesPerView={2}
+                  autoplay={{
+                    delay: 5000,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true,
+                  }}
+                  breakpoints={{
+                    640: { slidesPerView: 3 },
+                    1024: { slidesPerView: 4 },
+                    1440: { slidesPerView: 5 },
+                  }}
+                  className="!px-1 !py-2"
+                >
+                  {products.map((product, index) => (
+                    <SwiperSlide
+                      key={product?._id || product?.id || index}
+                      className="!h-auto"
+                    >
+                      <div className="h-full">
+                        <ProductCard product={product} />
+                      </div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+
+                {/* Previous button (right in RTL) */}
+                <button
+                  type="button"
+                  onClick={() => swiperRef.current?.slidePrev()}
+                  aria-label="قبلی"
+                  className="absolute right-3 top-1/2 z-10 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-2xl border border-blue-100 bg-white text-blue-600 shadow-lg transition hover:bg-blue-600 hover:text-white md:flex"
+                >
+                  <HiOutlineChevronRight className="text-2xl" />
+                </button>
+
+                {/* Next button (left in RTL) */}
+                <button
+                  type="button"
+                  onClick={() => swiperRef.current?.slideNext()}
+                  aria-label="بعدی"
+                  className="absolute left-3 top-1/2 z-10 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-2xl border border-blue-100 bg-white text-blue-600 shadow-lg transition hover:bg-blue-600 hover:text-white md:flex"
+                >
+                  <HiOutlineChevronLeft className="text-2xl" />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </section>
