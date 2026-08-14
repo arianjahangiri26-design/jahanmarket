@@ -79,7 +79,9 @@ export default function ProductCard({ product }) {
   return (
     <Link
       href={href}
-      className={`group relative mx-auto flex h-full w-full max-w-[320px] flex-col overflow-hidden rounded-[32px] border border-[#D9E7F5] bg-white shadow-[0_12px_45px_-15px_rgba(11,60,93,0.08)] transition-transform duration-300 hover:scale-[1.02] ${isOutOfStock ? "opacity-60" : ""}`}
+      className={`group relative mx-auto flex h-full w-full max-w-[320px] flex-col overflow-hidden rounded-[32px] border border-[#D9E7F5] bg-white shadow-[0_12px_45px_-15px_rgba(11,60,93,0.08)] transition-transform duration-300 hover:scale-[1.02] ${
+        isOutOfStock ? "opacity-60" : ""
+      }`}
     >
       <div className="relative p-4 pb-0">
         {/* Blue gradient media area */}
@@ -101,14 +103,13 @@ export default function ProductCard({ product }) {
             )}
           </div>
 
-+          {/* Out of stock badge */}
-+          {isOutOfStock && (
-+            <div className="absolute left-4 top-4 z-30">
-+              <span className="rounded-full bg-gray-200 px-3 py-1 text-[12px] font-bold text-gray-700">
-+                ناموجود
-+              </span>
-+            </div>
-+          )}
+          {isOutOfStock && (
+            <div className="absolute left-4 top-4 z-30">
+              <span className="rounded-full bg-gray-200 px-3 py-1 text-[12px] font-bold text-gray-700">
+                ناموجود
+              </span>
+            </div>
+          )}
 
           <div className="relative h-[240px] w-full overflow-hidden rounded-[20px]">
             <Image
