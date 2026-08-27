@@ -1,3 +1,14 @@
+export const metadata = {
+  title: "پروفایل من",
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+  },
+};
+
+import AddressesPreview from "@/components/user-panel/addresses/ui/AddressesPreview";
+
 export default function UserPanelPage() {
   return (
     <section className="space-y-4">
@@ -11,12 +22,18 @@ export default function UserPanelPage() {
         </p>
       </div>
 
-      {/* Example content box */}
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-        <p className="text-sm leading-7 text-slate-700">
-          این صفحه، صفحه اصلی پنل کاربری است. می‌توانی در این بخش خلاصه سفارش‌ها،
-          آدرس‌ها، علاقه‌مندی‌ها و اطلاعات حساب را نمایش بدهی.
-        </p>
+      {/* Addresses preview + quick summary box */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="md:col-span-2">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5">
+            <AddressesPreview />
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-5">
+          <h3 className="text-sm font-bold text-slate-800">خلاصه حساب</h3>
+          <p className="mt-3 text-sm text-slate-500">خلاصه‌ای از سفارش‌ها، آدرس‌ها و اطلاعات حساب شما در اینجا نمایش داده می‌شود.</p>
+        </div>
       </div>
     </section>
   );

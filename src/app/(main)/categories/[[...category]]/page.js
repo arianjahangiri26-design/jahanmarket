@@ -1,4 +1,5 @@
-import FetchCategoryProductsLogic from "../../../../components/main/fetch-category-products/fetchCategoryProductsLogic";
+import FetchCategoryProductsLogic from "@/components/main/fetch-category-products/logic/fetchCategoryProductsLogic";
+
  
 export default async function CategoryProductPage({
   params,

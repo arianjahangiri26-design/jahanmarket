@@ -1,42 +1,27 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import mongoose from "mongoose";
 
 import connectToDatabase from "@/lib/database/db";
 import Address from "@/models/address";
 import Cart from "@/models/cart";
 import Order from "@/models/order";
 import Product from "@/models/product";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-
+import { authOptions } from "../../auth/[...nextauth]/route";
+ 
+ 
 export const dynamic = "force-dynamic";
 
 /**
- * Returns a safe public representation of the authenticated user.
- * Sensitive information should never be returned from this endpoint.
- */
-const getSafeUser = (session) => {
-  return {
-    id: session?.user?.id || null,
-    name: session?.user?.name || "",
-    email: session?.user?.email || "",
-    image: session?.user?.image || null,
-  };
-};
-
-/**
  * GET /api/order
- *
- * Returns only the orders that belong to the authenticated user.
+ * Returns all orders that belong to the authenticated user.
  */
 export async function GET() {
   try {
     await connectToDatabase();
 
     const session = await getServerSession(authOptions);
-    const userId = session?.user?.id;
 
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         {
           success: false,
@@ -46,10 +31,7 @@ export async function GET() {
       );
     }
 
-    // Always filter orders by the authenticated user's ID.
-    const orders = await Order.find({
-      user: userId,
-    })
+    const orders = await Order.find({ user: session.user.id })
       .populate("items.product")
       .populate("address")
       .sort({ createdAt: -1 })
@@ -58,7 +40,7 @@ export async function GET() {
     const summary = {
       totalOrders: orders.length,
       totalSpent: orders.reduce((total, order) => {
-        return total + Number(order?.finalPrice ?? order?.totalPrice ?? 0);
+        return total + Number(order?.finalPrice || order?.totalPrice || 0);
       }, 0),
       pendingCount: orders.filter(
         (order) => order?.status === "در انتظار پرداخت"
@@ -69,7 +51,6 @@ export async function GET() {
       {
         success: true,
         data: {
-          user: getSafeUser(session),
           orders,
           summary,
         },
@@ -91,7 +72,6 @@ export async function GET() {
 
 /**
  * POST /api/order
- *
  * Creates a new order from the authenticated user's cart.
  */
 export async function POST(request) {
@@ -99,9 +79,8 @@ export async function POST(request) {
     await connectToDatabase();
 
     const session = await getServerSession(authOptions);
-    const userId = session?.user?.id;
 
-    if (!userId) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         {
           success: false,
@@ -124,24 +103,12 @@ export async function POST(request) {
       );
     }
 
-    // Prevent invalid MongoDB ObjectId errors.
-    if (!mongoose.Types.ObjectId.isValid(addressId)) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "شناسه آدرس معتبر نیست.",
-        },
-        { status: 400 }
-      );
-    }
-
-    // Make sure the selected address belongs to the authenticated user.
-    const address = await Address.findOne({
+    const addressExists = await Address.findOne({
       _id: addressId,
-      user: userId,
-    }).lean();
+      user: session.user.id,
+    });
 
-    if (!address) {
+    if (!addressExists) {
       return NextResponse.json(
         {
           success: false,
@@ -151,9 +118,8 @@ export async function POST(request) {
       );
     }
 
-    // Retrieve only the authenticated user's cart.
     const userCart = await Cart.findOne({
-      user: userId,
+      user: session.user.id,
     }).populate("items.product");
 
     if (!userCart?.items?.length) {
@@ -166,7 +132,6 @@ export async function POST(request) {
       );
     }
 
-    // Validate products and stock before creating the order.
     for (const item of userCart.items) {
       const product = item?.product;
       const quantity = Number(item?.quantity);
@@ -205,19 +170,14 @@ export async function POST(request) {
     const totalPrice = userCart.items.reduce((total, item) => {
       const price = Number(item?.product?.price || 0);
       const quantity = Number(item?.quantity || 0);
-
       return total + price * quantity;
     }, 0);
 
-    const discountPrice = Math.max(
-      Number(userCart.discountPrice || 0),
-      0
-    );
-
+    const discountPrice = Number(userCart.discountPrice || 0);
     const finalPrice = Math.max(totalPrice - discountPrice, 0);
 
     const newOrder = await Order.create({
-      user: userId,
+      user: session.user.id,
       address: addressId,
       items: userCart.items.map((item) => ({
         product: item.product._id,
@@ -230,7 +190,6 @@ export async function POST(request) {
       status: "در انتظار پرداخت",
     });
 
-    // Decrease stock and increase sold count.
     for (const item of userCart.items) {
       const quantity = Number(item.quantity);
 
@@ -242,9 +201,8 @@ export async function POST(request) {
       });
     }
 
-    // Clear only the authenticated user's cart.
     await Cart.deleteOne({
-      user: userId,
+      user: session.user.id,
     });
 
     return NextResponse.json(

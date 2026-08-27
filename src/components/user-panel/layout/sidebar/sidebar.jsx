@@ -28,7 +28,7 @@ export default function UserSidebar() {
     () => [
       { title: "پروفایل من", path: "/user-panel", icon: User },
       { title: "سفارش‌های من", path: "/user-panel/orders", icon: ShoppingBag },
-      { title: "آدرس‌های من", path: "/user-panel/addresses", icon: MapPin },
+      { title: "آدرس‌های من", path: "/user-panel/setting/addresses", icon: MapPin },
       { title: "علاقه‌مندی‌ها", path: "/user-panel/favorites", icon: Heart },
       { title: "نظرات ثبت شده", path: "/user-panel/comments", icon: MessageSquare },
     ],

@@ -74,7 +74,6 @@ export default function EditProductLogic() {
           });
         }
       } catch (error) {
-        console.error("FETCH PRODUCT DATA ERROR:", error);
       } finally {
         setPageLoading(false);
       }
@@ -115,7 +114,6 @@ export default function EditProductLogic() {
         router.push("/admin/products");
       }
     } catch (error) {
-      console.error("UPDATE PRODUCT PROCESS ERROR:", error);
     }
   };
 

@@ -3,18 +3,12 @@
 import { useMemo, useState } from "react";
 import { useFetch } from "@/hooks/crud/UseCrud";
 import ProductSkeleton from "@/lib/loading/skeleton/main/product/productSkeleton";
-import FetchCategoryProductsDesign from "./fetchCategoryProductsdesign";
+ 
+import { CATEGORIES_REQUEST, getArrayData, getCurrentSlug, getSortedAndFilteredProducts, INITIAL_PRICE_RANGE, normalizeText, PRODUCTS_REQUEST } from "../fetchCategoryProducts.utils";
 
-import {
-  PRODUCTS_REQUEST,
-  CATEGORIES_REQUEST,
-  INITIAL_PRICE_RANGE,
-  getArrayData,
-  getCurrentSlug,
-  getSortedAndFilteredProducts,
-  normalizeText,
-} from "./fetchCategoryProducts.utils";
-
+ fetchc 
+ 
+ 
 export default function FetchCategoryProductsLogic({
   slugParts = [],
   searchQuery = "",
