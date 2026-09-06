@@ -1,30 +1,44 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const globalForMongoose = globalThis;
 
-if (!MONGODB_URI) {
-  throw new Error("اتصال پیدا نشد");
-}
-
-let cached = global.mongoose;
+let cached = globalForMongoose.mongoose;
 
 if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
+  cached = globalForMongoose.mongoose = {
+    conn: null,
+    promise: null,
+  };
 }
 
 async function connectToDatabase() {
+  const MONGODB_URI = process.env.MONGODB_URI;
+
+  // این بررسی باید داخل تابع باشد، نه در سطح فایل
+  if (!MONGODB_URI) {
+    throw new Error(
+      "اتصال پیدا نشد: متغیر محیطی MONGODB_URI تعریف نشده است"
+    );
+  }
+
   if (cached.conn) {
     return cached.conn;
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose
-      .connect(MONGODB_URI)
-      .then((mongoose) => {
-        return mongoose;
-      });
+    cached.promise = mongoose.connect(MONGODB_URI, {
+      bufferCommands: false,
+    });
   }
-  cached.conn = await cached.promise;
+
+  try {
+    cached.conn = await cached.promise;
+  } catch (error) {
+    // برای اینکه درخواست بعدی دوباره امکان اتصال داشته باشد
+    cached.promise = null;
+    throw error;
+  }
+
   return cached.conn;
 }
 
