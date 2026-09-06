@@ -1,6 +1,6 @@
-import EditCategoryLogic from '@/components/admin/Category/edite-category/EditeCategory';
+ 
 
-
+import EditCategoryLogic from '@/components/admin/Category/edite/EditeCategory';
 import React from 'react'
 
 const EditeCategory = () => {

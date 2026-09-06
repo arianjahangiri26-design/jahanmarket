@@ -1,13 +1,14 @@
 // app/api/admin/discounts/[id]/route.js
 import connectToDatabase from "@/lib/database/db";
-import DiscountCode from "@/models/Discount";
-
+ 
+ 
 import { ZodError } from "zod";
 import { updateDiscountSchema } from "@/lib/validators/admin/discounts/discount.validation";
 import { errorResponse, successResponse } from "@/lib/utils/apiResponse";
-import DiscountCode from "@/models/discountcode";
+ 
 import category from "@/models/Category";
-
+import DiscountCode from "@/models/discountcode";
+ 
 /**
  * GET /api/admin/discounts/:id
  * Get single discount details

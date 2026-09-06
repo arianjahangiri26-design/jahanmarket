@@ -4,9 +4,10 @@ import { userAuth } from "@/lib/validators/auth/auth.schema";
 import otp from "@/models/otp";
 import { ZodError } from "zod";
 import { resolveAuthContact } from "@/lib/auth/resolveAuthContact";
-import { hashOtpCode } from "@/lib/auth/otpHash";
+ 
 import { errorResponse, successResponse } from "@/lib/utils/apiResponse";
-
+import { hashOtpCode } from "@/lib/auth/otpHash";
+ 
 const MAX_ATTEMPTS = 5;
 
 const verifyOtp = async (req) => {

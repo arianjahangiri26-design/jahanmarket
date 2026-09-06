@@ -1,5 +1,6 @@
-import EditAddressLogic from "@/components/admin/address/edit/EditAddressLogic";
+import EditAddressLogic from "@/components/user-panel/address/edit/EditAddressLogic";
 
+ 
 export const metadata = {
   title: "ویرایش آدرس",
   robots: { index: false, follow: false, nocache: true },

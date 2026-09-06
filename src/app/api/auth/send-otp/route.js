@@ -7,7 +7,7 @@ import { ZodError } from "zod";
 import { resolveAuthContact } from "@/lib/auth/resolveAuthContact";
 import { hashOtpCode } from "@/lib/auth/otpHash";
 import { errorResponse, successResponse } from "@/lib/utils/apiResponse";
-
+hashOtpCode
 const RESEND_COOLDOWN_MS = 60 * 1000; // حداقل فاصله بین دو ارسال (دفاع سمت سرور، مستقل از تایمر فرانت)
 
 export async function POST(req) {

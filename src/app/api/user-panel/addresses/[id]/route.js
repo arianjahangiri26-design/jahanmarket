@@ -5,10 +5,11 @@ import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/database/db";
 import Address from "@/models/address";
 
-import { updateAddressSchema } from "@/lib/validators/address/address.validation";
+ 
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { updateAddressSchema } from "@/lib/validators/admin/address/address.validation";
  
- 
+  
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
  
 export async function GET(  context) {
