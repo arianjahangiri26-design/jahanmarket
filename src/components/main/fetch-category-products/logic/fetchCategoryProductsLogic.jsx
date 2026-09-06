@@ -5,8 +5,9 @@ import { useFetch } from "@/hooks/crud/UseCrud";
 import ProductSkeleton from "@/lib/loading/skeleton/main/product/productSkeleton";
  
 import { CATEGORIES_REQUEST, getArrayData, getCurrentSlug, getSortedAndFilteredProducts, INITIAL_PRICE_RANGE, normalizeText, PRODUCTS_REQUEST } from "../fetchCategoryProducts.utils";
+import FetchCategoryProductsDesign from "../ui/fetchCategoryProductsdesign";
 
- fetchc 
+   
  
  
 export default function FetchCategoryProductsLogic({

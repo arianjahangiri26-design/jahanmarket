@@ -1,18 +1,9 @@
- 
-import CreateProductLogic from '@/components/admin/product/create/Createproduct';
- 
- 
-import React from 'react'
+import CreateProductLogic from "@/components/admin/product/create/Createproduct";
 
-    const  CreateProduct = () => {
-        return (
-    <div>
-          
-        
-      <CreateProductLogic/>
-      
-    </div>
-    );
-};
+ 
+export default function CreateProductPage() {
 
-export default CreateProduct;
+ 
+
+  return <CreateProductLogic />;
+}

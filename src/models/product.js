@@ -6,13 +6,11 @@ const ProductFeatureSchema = new mongoose.Schema(
       type: String,
       required: [true, "عنوان ویژگی الزامی است"],
       trim: true,
-      maxlength: [50, "عنوان ویژگی خیلی طولانی است"],
     },
     value: {
       type: String,
       required: [true, "مقدار ویژگی الزامی است"],
       trim: true,
-      maxlength: [200, "مقدار ویژگی خیلی طولانی است"],
     },
   },
   { _id: false }
@@ -22,72 +20,60 @@ const ProductSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "نام الزامی است"],
-      minlength: [3, "نام باید حداقل 3 کاراکتر باشد"],
-      maxlength: [50, "نام خیلی طولانی است"],
+      required: [true, "نام محصول الزامی است"],
       trim: true,
     },
-
     description: {
       type: String,
       trim: true,
-      maxlength: [2000, "توضیحات خیلی طولانی است"],
       default: "",
     },
-
-    imageProduct: {
-      type: String,
-      required: [true, "عکس محصول الزامی است"],
-      trim: true,
+    images: {
+      type: [String],
+      default: [],
     },
-
+    price: {
+      type: Number,
+      required: [true, "قیمت الزامی است"],
+      min: 0,
+      default: 0,
+    },
     discountprice: {
       type: Number,
+      default: 0,
+      min: 0,
     },
-
     stock: {
       type: Number,
       required: [true, "موجودی الزامی است"],
       default: 1,
-      min: [0, "موجودی نمی‌تواند منفی باشد"],
+      min: 0,
     },
-
-    price: {
-      type: Number,
-      required: [true, "قیمت الزامی است"],
-      default: 1,
-      min: [0, "قیمت نمی‌تواند منفی باشد"],
-    },
-
-    isActive: {
-      type: Boolean,
-      default: false,
-    },
-
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
       required: [true, "دسته‌بندی الزامی است"],
     },
-    sold: {
-      type: Number,
-      default: 0,
-      min: [0, "تعداد فروش نمی‌تواند منفی باشد"],
-    },
     features: {
       type: [ProductFeatureSchema],
       default: [],
     },
-
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    sold: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Users",
-      required: [true, "کاربر سازنده الزامی است"],
+      required: [true, "کاربر ثبت‌کننده الزامی است"],
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 export default mongoose.models.Product || mongoose.model("Product", ProductSchema);

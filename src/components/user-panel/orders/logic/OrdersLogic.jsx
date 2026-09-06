@@ -1,13 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-
 import { useSession } from "next-auth/react";
-
 import { useFetch } from "@/hooks/crud/UseCrud";
 import OrdersDashboard from "../ui/OrdersDashboard";
- 
- 
+
 const DEFAULT_SUMMARY = {
   totalOrders: 0,
   totalSpent: 0,
@@ -21,34 +18,19 @@ const DEFAULT_USER = {
   image: null,
 };
 
-/**
- * Extracts the normalized API data from the response.
- *
- * Expected API response:
- * {
- *   success: true,
- *   data: {
- *     user,
- *     orders,
- *     summary
- *   }
- * }
- */
 const normalizeResponse = (response) => {
-  const data = response?.data || {};
+  const payload = response?.data?.data || response?.data || {};
 
   return {
-    user: data?.user || DEFAULT_USER,
-    orders: Array.isArray(data?.orders) ? data.orders : [],
-    summary: data?.summary || DEFAULT_SUMMARY,
+    orders: Array.isArray(payload.orders) ? payload.orders : [],
+    user: payload.user || DEFAULT_USER,
+    summary: payload.summary || DEFAULT_SUMMARY,
   };
 };
 
 export default function OrdersLogic() {
-  const { request, loading } = useFetch();
-
-  // Read the authenticated user from the NextAuth session.
-  const { data: session, status } = useSession();
+  const { request, loading: apiLoading } = useFetch();
+  const { data: session, status: sessionStatus } = useSession();
 
   const [orders, setOrders] = useState([]);
   const [user, setUser] = useState(DEFAULT_USER);
@@ -56,35 +38,38 @@ export default function OrdersLogic() {
   const [serverError, setServerError] = useState("");
 
   const userId = session?.user?.id || null;
+  const isLoading = apiLoading || sessionStatus === "loading";
+
+  const resetData = useCallback(() => {
+    setOrders([]);
+    setUser(DEFAULT_USER);
+    setSummary(DEFAULT_SUMMARY);
+  }, []);
 
   const fetchOrders = useCallback(async () => {
     setServerError("");
 
-    // Do not call the API when the user is not authenticated.
     if (!userId) {
-      setOrders([]);
-      setUser(DEFAULT_USER);
-      setSummary(DEFAULT_SUMMARY);
-      setServerError("برای مشاهده سفارش‌ها ابتدا وارد حساب کاربری شوید.");
+      resetData();
+      setServerError("Please log in to view your orders.");
       return;
     }
 
     try {
       const response = await request({
         method: "GET",
-        // Pass the user id to the backend as a query parameter.
         url: `/api/order?userId=${encodeURIComponent(userId)}`,
       });
 
+      console.log("Orders response:", response);
+
       if (!response?.success) {
-        setOrders([]);
-        setUser(DEFAULT_USER);
-        setSummary(DEFAULT_SUMMARY);
+        resetData();
 
         setServerError(
           response?.message ||
             response?.error ||
-            "خطا در دریافت سفارش‌ها"
+            "Error fetching orders."
         );
 
         return;
@@ -92,33 +77,32 @@ export default function OrdersLogic() {
 
       const normalizedData = normalizeResponse(response);
 
+      console.log("Normalized orders:", normalizedData);
+
       setOrders(normalizedData.orders);
       setUser(normalizedData.user);
       setSummary(normalizedData.summary);
     } catch (error) {
       console.error("FETCH ORDERS ERROR:", error);
 
-      setOrders([]);
-      setUser(DEFAULT_USER);
-      setSummary(DEFAULT_SUMMARY);
-      setServerError("خطا در ارتباط با سرور");
+      resetData();
+      setServerError("Server connection error.");
     }
-  }, [request, userId]);
+  }, [request, resetData, userId]);
 
   useEffect(() => {
-    // Wait until the session is fully loaded before fetching.
-    if (status !== "loading") {
+    if (sessionStatus !== "loading") {
       fetchOrders();
     }
-  }, [fetchOrders, status]);
+  }, [fetchOrders, sessionStatus]);
 
   return (
     <OrdersDashboard
       orders={orders}
       user={user}
-      loading={loading || status === "loading"}
-      serverError={serverError}
       summary={summary}
+      loading={isLoading}
+      serverError={serverError}
       onRetry={fetchOrders}
     />
   );

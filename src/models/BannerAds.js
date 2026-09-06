@@ -10,37 +10,54 @@ const BannerAdsSchema = new mongoose.Schema(
     description: {
       type: String,
       trim: true,
+      default: "",
     },
-    // تصویر نسخه دسکتاپ (ابعاد بزرگ)
     desktopImage: {
       type: String,
       required: [true, "تصویر نسخه دسکتاپ الزامی است"],
     },
-    // تصویر بهینه‌شده برای موبایل (عمودی یا ابعاد کوچک‌تر)
     mobileImage: {
       type: String,
+      default: "",
     },
     link: {
       type: String,
       trim: true,
+      default: "",
     },
-    // اولویت نمایش بنرها به ترتیب (مثلاً ۱، ۲، ۳)
     order: {
       type: Number,
       default: 0,
     },
-    // دسته‌بندی جایگاه بنر (مثال: 'main-slider', 'hero-right', 'footer-banner')
     position: {
       type: String,
       default: "main-slider",
       trim: true,
+      index: true,
+    },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      default: null,
+      index: true,
+    },
+    startsAt: {
+      type: Date,
+      default: null,
+    },
+    endsAt: {
+      type: Date,
+      default: null,
     },
     isActive: {
       type: Boolean,
       default: true,
+      index: true,
     },
   },
   { timestamps: true }
 );
+
+BannerAdsSchema.index({ position: 1, isActive: 1, order: 1, createdAt: -1 });
 
 export default mongoose.models.BannerAds || mongoose.model("BannerAds", BannerAdsSchema);

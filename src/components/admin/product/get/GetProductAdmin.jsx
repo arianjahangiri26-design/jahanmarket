@@ -14,10 +14,14 @@ export default function ProductsListLogic() {
   const currentSort = searchParams.get("sort") || "newest";
 
   const fetchProducts = async () => {
-    await request({
-      method: "GET",
-      url: "/api/admin/products",
-    });
+    try {
+      await request({
+        method: "GET",
+        url: "/api/admin/products",
+      });
+    } catch {
+      // هندل بی‌صدا
+    }
   };
 
   useEffect(() => {
@@ -25,13 +29,19 @@ export default function ProductsListLogic() {
   }, []);
 
   const handleDelete = async (id) => {
-    const res = await request({
-      method: "DELETE",
-      url: `/api/admin/products/${id}`,
-    });
+    if (!confirm("آیا از حذف این محصول اطمینان دارید؟")) return;
 
-    if (res?.data?.success || res?.success) {
-      fetchProducts();
+    try {
+      const res = await request({
+        method: "DELETE",
+        url: `/api/admin/products/${id}`,
+      });
+
+      if (res?.data?.success || res?.success) {
+        fetchProducts();
+      }
+    } catch {
+      // هندل بی‌صدا
     }
   };
 
@@ -45,12 +55,19 @@ export default function ProductsListLogic() {
     { key: "isActive", label: "وضعیت" },
   ];
 
-  const products = data?.message?.data || data?.data || [];
+  const rawProducts = data?.data || data?.message?.data || (Array.isArray(data) ? data : []);
 
   const filteredProducts = useMemo(() => {
-    let result = [...products];
+    let result = rawProducts.map((product) => ({
+      ...product,
+      // اگر جدول به دنبال imageProduct می‌گردد، تصویر اول را پاس می‌دهیم:
+      imageProduct:
+        Array.isArray(product.images) && product.images.length > 0
+          ? product.images[0]
+          : "/placeholder.png",
+    }));
 
-    // فیلتر وضعیت
+    // فیلتر بر اساس وضعیت فعال/غیرفعال
     if (currentStatus === "active") {
       result = result.filter((item) => item.isActive === true);
     } else if (currentStatus === "inactive") {
@@ -62,21 +79,17 @@ export default function ProductsListLogic() {
       const aTime = new Date(a.createdAt || a.updatedAt || 0).getTime();
       const bTime = new Date(b.createdAt || b.updatedAt || 0).getTime();
 
-      if (currentSort === "oldest") {
-        return aTime - bTime;
-      }
-
+      if (currentSort === "oldest") return aTime - bTime;
       if (currentSort === "updated") {
         const aUpdated = new Date(a.updatedAt || 0).getTime();
         const bUpdated = new Date(b.updatedAt || 0).getTime();
         return bUpdated - aUpdated;
       }
-
       return bTime - aTime; // newest
     });
 
     return result;
-  }, [products, currentStatus, currentSort]);
+  }, [rawProducts, currentStatus, currentSort]);
 
   if (loading) {
     return (

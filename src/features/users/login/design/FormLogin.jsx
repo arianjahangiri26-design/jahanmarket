@@ -1,9 +1,5 @@
-"use client";
- 
 import ControlledInput from "@/shared/form/InputeControler";
-import { useFormContext } from "react-hook-form";
- 
- 
+
 const inputClass =
   "w-full px-4 py-3 rounded-xl border border-blue-200 bg-blue-50/40 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200";
 
@@ -13,21 +9,18 @@ export default function Logindesign({
   handelLogin,
   serverError,
   loading,
+  errors = {},
 }) {
-  const {
-    formState: { errors },
-  } = useFormContext();
-
   const submitHandler = async (event) => {
     event.preventDefault();
     await handelLogin();
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen from-blue-900 via-slate-900 to-blue-950">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-900 via-slate-900 to-blue-950 px-4">
       <div className="w-full max-w-md p-8 bg-white/95 backdrop-blur rounded-2xl shadow-[0_25px_60px_-10px_rgba(0,0,0,0.45)] border border-blue-100">
         <h2 className="text-2xl font-bold text-center mb-6 text-blue-900">
-          ورود
+          ورود به حساب کاربری
         </h2>
 
         <form onSubmit={submitHandler} className="flex flex-col gap-5">

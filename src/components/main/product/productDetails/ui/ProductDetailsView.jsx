@@ -32,21 +32,20 @@ export default function ProductDetailsView({ product }) {
         </div>
 
         {/* Hero section */}
-        <section className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
-          <div className="lg:col-span-5">
-            <ProductGallery
-              image={product?.imageProduct}
-              title={product?.name}
-            />
-          </div>
+       <section className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
+  <div className="lg:col-span-5">
+    <ProductGallery
+      images={product?.images}
+      image={product?.imageProduct || product?.image}
+      title={product?.name}
+    />
+  </div>
 
-          <div className="lg:col-span-7">
-            <ProductInfoCard
-              product={product}
-              commentsCount={commentsCount}
-            />
-          </div>
-        </section>
+  <div className="lg:col-span-7">
+    <ProductInfoCard product={product} commentsCount={commentsCount} />
+  </div>
+</section>
+
 
         {/* Description section */}
         <section className="mt-10 overflow-hidden rounded-[32px] border border-blue-100 bg-white shadow-xl shadow-blue-100/30">

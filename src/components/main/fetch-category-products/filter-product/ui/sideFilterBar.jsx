@@ -51,7 +51,7 @@ export default function SideFilterBar({
   };
 
   return (
-    <div className="rounded-[30px] border border-zinc-200 bg-white p-6 shadow-[0_20px_55px_-30px_rgba(15,23,42,0.18)]">
+    <div className="rounded-[30px]  border border-zinc-200 bg-white p-6 shadow-[0_20px_55px_-30px_rgba(15,23,42,0.18)]">
       <div className="mb-7 flex items-center gap-4 border-b border-zinc-100 pb-5">
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-100">
           <Funnel className="h-5 w-5" />

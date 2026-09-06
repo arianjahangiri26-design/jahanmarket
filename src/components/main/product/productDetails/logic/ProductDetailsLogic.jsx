@@ -10,6 +10,7 @@ import ProductDetailsView from "../ui/ProductDetailsView";
     { method: "GET", url: `/api/admin/products/${id}` },
     [id]
   );
+ console.log(data);
  
   if (loading) return <ProductSkeleton />;
  

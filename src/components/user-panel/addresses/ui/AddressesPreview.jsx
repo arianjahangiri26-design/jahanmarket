@@ -69,11 +69,7 @@ export default function AddressesPreview() {
         </div>
       </div>
 
-      <div className="shrink-0 w-[120px] hidden sm:block">
-        <div className="rounded-2xl border border-slate-100 bg-white p-3 text-center text-xs text-slate-500">
-          برای ارسال سفارش‌ها آدرس پیش‌فرض را انتخاب کنید
-        </div>
-      </div>
+     
     </div>
   );
 }

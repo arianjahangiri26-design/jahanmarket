@@ -1,101 +1,61 @@
 // src/hooks/crud/UseCrud.js
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 /**
- * Custom hook for handling API requests using Axios.
- * Supports auto-fetching on mount and manual request triggering.
- *
- * @param {object|null} initialConfig - Axios request config for immediate fetch.
- * @param {Array} dependencies - Dependency array to re-run the auto-fetch when values change.
+ * Clean & minimal custom hook for API requests
  */
-export function useFetch(initialConfig = null, dependencies = []) {
-  const [loading, setLoading] = useState(Boolean(initialConfig));
-  const [error, setError] = useState(null);
+export function useFetch(config = null, deps = []) {
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(!!config);
+  const [error, setError] = useState(null);
 
-  // Store the active AbortController to cancel pending requests if needed.
-  const abortControllerRef = useRef(null);
-
-  /**
-   * Performs an asynchronous HTTP request using Axios.
-   */
-  const request = useCallback(async (config) => {
-    // Cancel any previous unfinished request before starting a new one.
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-
-    // Create a new AbortController for the current request.
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-
+  // Manual request trigger
+  const request = useCallback(async (customConfig) => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await axios({
-        ...config,
-        signal: controller.signal,
-      });
-
-      setData(response.data);
-
-      return {
-        success: true,
-        data: response.data,
-      };
+      const res = await axios(customConfig || config);
+      setData(res.data);
+      return { success: true, data: res.data };
     } catch (err) {
-      // Avoid updating state if the request was intentionally aborted.
-      if (axios.isCancel(err)) {
-        return {
-          success: false,
-          error: "Request aborted",
-          isAborted: true,
-        };
-      }
-
-      const message =
-        err?.response?.data?.message || err?.message || "An error occurred";
-
-      setError(message);
-
-      return {
-        success: false,
-        error: message,
-      };
+      const msg = err.response?.data?.message || err.message || "An error occurred";
+      setError(msg);
+      return { success: false, error: msg };
     } finally {
-      // Only set loading to false if this request is still the active one.
-      if (abortControllerRef.current === controller) {
-        setLoading(false);
-      }
+      setLoading(false);
     }
   }, []);
 
-  /**
-   * Automatically triggers the request if initialConfig is provided.
-   * Cleans up pending requests when the component unmounts.
-   */
+  // Auto-fetch on mount if config provided
   useEffect(() => {
-    if (initialConfig) {
-      request(initialConfig);
+    let isMounted = true;
+
+    if (config) {
+      setLoading(true);
+      axios(config)
+        .then((res) => {
+          if (isMounted) {
+            setData(res.data);
+            setError(null);
+          }
+        })
+        .catch((err) => {
+          if (isMounted) {
+            setError(err.response?.data?.message || err.message || "An error occurred");
+          }
+        })
+        .finally(() => {
+          if (isMounted) setLoading(false);
+        });
     }
 
-    // Cleanup function to cancel pending requests when unmounting or dependencies change.
     return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
+      isMounted = false;
     };
-    // Deep dependency watching is simplified by safely spreading the dependencies array.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [request, ...dependencies]);
+  }, deps);
 
-  return {
-    request,
-    loading,
-    error,
-    data,
-    setData,
-  };
+  return { data, setData, loading, error, request };
 }

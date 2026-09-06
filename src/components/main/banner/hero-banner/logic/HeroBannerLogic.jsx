@@ -3,48 +3,43 @@
 import { useMemo } from "react";
 import { useFetch } from "@/hooks/crud/UseCrud";
 import HeroBannerView from "../ui/HeroBannerView";
- 
-   
 
 export default function HeroBannerLogic() {
-    const { data, loading, error } = useFetch(
-        {
-            method: "GET",
-            url: "/api/admin/banner-ads",
+  const { data, loading, error } = useFetch(
+    {
+      method: "GET",
+      url: "/api/banner-ads",
+    },
+    []
+  );
 
-        },
-        []
+  // Filter and prepare banners for the main slider
+  const banners = useMemo(() => {
+    const rawBanners = Array.isArray(data?.message?.data) ? data.message.data : [];
+
+    return rawBanners
+      .filter((banner) => {
+        const isMainSlider = banner?.position === "main-slider";
+        const isActive = banner?.isActive !== false;
+        const hasImage = !!(banner?.desktopImage || banner?.mobileImage);
+
+        return isMainSlider && isActive && hasImage;
+      })
+      .map((banner) => ({
+        ...banner,
+        // Fallback mobile image to desktop image if empty
+        mobileImage: banner.mobileImage || banner.desktopImage,
+      }))
+      .sort((a, b) => (Number(a?.order) || 0) - (Number(b?.order) || 0));
+  }, [data]);
+
+  if (loading) {
+    return (
+      <div className="relative h-[280px] w-full overflow-hidden rounded-[32px] bg-slate-200 animate-pulse md:h-[400px] lg:h-[650px]" />
     );
+  }
 
-    const banners = useMemo(() => {
-        const rawBanners = data?.message?.data || data?.data || [];
-console.log(rawBanners);
+  if (error || !banners.length) return null;
 
-        return rawBanners
-            .filter(
-                (banner) =>
-                    banner?.isActive === true &&
-                    banner?.position === "main-slider" &&
-                    (banner?.desktopImage || banner?.mobileImage)
-            )
-            .sort((a, b) => (a?.order || 0) - (b?.order || 0));
-    }, [data]);
- 
-    if (loading) {
-        return (
-            <div className="relative h-[220px] overflow-hidden rounded-[32px] bg-slate-200 md:h-[320px] lg:h-[420px] animate-pulse">
-                <div className="absolute inset-0 bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200" />
-            </div>
-        );
-    }
-
-    if (error) {
-        return null;
-    }
-
-    if (!banners.length) {
-        return null;
-    }
-
-    return <HeroBannerView banners={banners} />;
+  return <HeroBannerView banners={banners} />;
 }

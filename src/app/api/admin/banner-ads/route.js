@@ -1,41 +1,32 @@
 import Banner from "@/models/BannerAds";
-
 import connectToDatabase from "@/lib/database/db";
- 
 import { successResponse, errorResponse } from "@/lib/utils/apiResponse";
-import fs from "fs";
-import path from "path";
 import { createBannerAdsSchema } from "@/lib/validators/admin/bannerAdes/bannerAds.validation";
+import { removeUploadFile, saveBannerImage } from "@/lib/upload-manager/server/uploadFileHelperServer";
+ 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-// ذخیره‌سازی فایل‌ها به صورت بافر
-const saveFile = async (file) => {
-  if (!file || file.size === 0) return "";
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-  const fileName = `${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
-  const uploadDir = path.join(process.cwd(), "public/uploads/banners");
-
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
-
-  const filePath = path.join(uploadDir, fileName);
-  fs.writeFileSync(filePath, buffer);
-  return `/uploads/banners/${fileName}`;
-};
-
-// دریافت تمام بنرها
 export async function GET(req) {
   try {
     await connectToDatabase();
 
     const url = new URL(req.url);
     const position = url.searchParams.get("position");
-    
+    const category = url.searchParams.get("category");
+    const isActive = url.searchParams.get("isActive");
+
     const filter = {};
     if (position) filter.position = position;
+    if (category) filter.category = category;
+    if (isActive !== null && isActive !== undefined && isActive !== "") {
+      filter.isActive = isActive === "true";
+    }
 
-    const banners = await Banner.find(filter).sort({ order: 1, createdAt: -1 });
+    const banners = await Banner.find(filter)
+      .populate("category", "title name slug")
+      .sort({ order: 1, createdAt: -1 })
+      .lean();
 
     return successResponse({
       message: "لیست بنرها دریافت شد",
@@ -51,58 +42,81 @@ export async function GET(req) {
   }
 }
 
-// ایجاد بنر جدید
 export async function POST(req) {
+  let uploadedDesktop = null;
+  let uploadedMobile = null;
+
   try {
     await connectToDatabase();
     const formData = await req.formData();
 
-    const body = {
+    const rawData = {
       title: formData.get("title"),
-      description: formData.get("description"),
-      link: formData.get("link"),
-      order: formData.get("order"),
+      description: formData.get("description") || "",
+      link: formData.get("link") || "",
+      order: formData.get("order") || 0,
       position: formData.get("position"),
-      isActive: formData.get("isActive") === "true",
+      category: formData.get("category") || null,
+      startsAt: formData.get("startsAt") || null,
+      endsAt: formData.get("endsAt") || null,
+      isActive: formData.get("isActive"),
     };
 
-    const validation = createBannerAdsSchema.safeParse(body);
+    const validation = createBannerAdsSchema.safeParse(rawData);
     if (!validation.success) {
       return errorResponse({
-        message: "اطلاعات معتبر نیست",
-        error: validation.error.flatten(),
+        message: "اطلاعات فرم معتبر نیست",
+        error: validation.error.flatten().fieldErrors,
         status: 400,
       });
     }
 
-    const desktopImageFile = formData.get("desktopImage");
-    const mobileImageFile = formData.get("mobileImage");
+    const desktopFile = formData.get("desktopImage");
+    const mobileFile = formData.get("mobileImage");
 
-    if (!desktopImageFile || desktopImageFile.size === 0) {
+    if (!desktopFile || typeof desktopFile !== "object" || desktopFile.size === 0) {
       return errorResponse({
         message: "تصویر دسکتاپ اجباری است",
         status: 400,
       });
     }
 
-    // آپلود فایل‌ها
-    const desktopImagePath = await saveFile(desktopImageFile);
-    const mobileImagePath = await saveFile(mobileImageFile);
+    try {
+      uploadedDesktop = await saveBannerImage(desktopFile);
+      if (mobileFile && typeof mobileFile === "object" && mobileFile.size > 0) {
+        uploadedMobile = await saveBannerImage(mobileFile);
+      }
+    } catch (uploadErr) {
+      if (uploadedDesktop) await removeUploadFile(uploadedDesktop);
+      return errorResponse({
+        message: uploadErr.message || "خطا در ذخیره‌سازی فایل",
+        status: uploadErr.status || 400,
+      });
+    }
 
-    const banner = await Banner.create({
+    const payload = {
       ...validation.data,
-      desktopImage: desktopImagePath,
-      mobileImage: mobileImagePath || undefined,
-    });
+      desktopImage: uploadedDesktop,
+      mobileImage: uploadedMobile || "",
+    };
+
+    if (payload.position !== "category-page") {
+      payload.category = null;
+    }
+
+    const banner = await Banner.create(payload);
 
     return successResponse({
-      message: "بنر با موفقیت ساخته شد",
+      message: "بنر با موفقیت ذخیره شد",
       data: banner,
       status: 201,
     });
   } catch (error) {
+    if (uploadedDesktop) await removeUploadFile(uploadedDesktop);
+    if (uploadedMobile) await removeUploadFile(uploadedMobile);
+
     return errorResponse({
-      message: "خطا در ساخت بنر",
+      message: "خطا در ایجاد بنر",
       error: error.message,
       status: 500,
     });

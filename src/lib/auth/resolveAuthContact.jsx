@@ -1,7 +1,9 @@
 const phoneRegex = /^09\d{9}$/;
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const clean = (value) => value?.trim() || "";
+// جلوگیری از NoSQL Injection: اگر ورودی رشته نباشد (مثلاً {"$ne": null})
+// به رشته خالی تبدیل می‌شود و در رگکس رد می‌شود
+const clean = (value) => (typeof value === "string" ? value.trim() : "");
 
 const isEmail = (value) => emailRegex.test(value);
 const isPhone = (value) => phoneRegex.test(value);
@@ -27,9 +29,12 @@ export function resolveAuthContact({
     return { error: "لطفاً ایمیل یا شماره موبایل معتبر وارد کنید" };
   }
 
+  const safePreferredTarget =
+    typeof preferredOtpTarget === "string" ? preferredOtpTarget : "email";
+
   const selectedTarget =
     hasEmail && hasPhone
-      ? preferredOtpTarget === "phone"
+      ? safePreferredTarget === "phone"
         ? "phone"
         : "email"
       : hasEmail

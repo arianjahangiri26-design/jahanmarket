@@ -1,43 +1,129 @@
+"use client";
+
+import { useState, useMemo } from "react";
 import Image from "next/image";
-import { FaSearchPlus } from "react-icons/fa";
+import Lightbox from "yet-another-react-lightbox";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
+import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
+import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
 
-export default function ProductGallery({ image, title }) {
+import "yet-another-react-lightbox/styles.css";
+import "yet-another-react-lightbox/plugins/thumbnails.css";
+
+import { FaSearchPlus, FaChevronRight, FaChevronLeft } from "react-icons/fa";
+
+export default function ProductGallery({ images = [], image, title = "محصول" }) {
+  // پاک‌سازی هوشمند و ساخت لیست یکتا
+  const imageList = useMemo(() => {
+    const raw = [image, ...(Array.isArray(images) ? images : [])];
+    const clean = [...new Set(raw.filter((i) => typeof i === "string" && i.trim()))];
+    return clean.length > 0 ? clean : ["/images/product-placeholder.png"];
+  }, [images, image]);
+
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
+  const [touchStartX, setTouchStartX] = useState(null);
+
+  const total = imageList.length;
+  const next = (e) => { e?.stopPropagation(); setActiveIdx((i) => (i + 1) % total); };
+  const prev = (e) => { e?.stopPropagation(); setActiveIdx((i) => (i - 1 + total) % total); };
+
+  // ژست لمسی (Swipe) برای تجربه عالی روی موبایل
+  const handleTouchEnd = (e) => {
+    if (touchStartX === null) return;
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (diff > 40) next();
+    if (diff < -40) prev();
+    setTouchStartX(null);
+  };
+
   return (
-    <div className="sticky top-24 overflow-hidden rounded-[28px] border border-blue-100 bg-white shadow-xl shadow-blue-100/40">
-      {/* Decorative top area */}
-      <div className="relative overflow-hidden border-b border-blue-50 bg-gradient-to-br from-blue-100 via-white to-cyan-50 px-4 py-4 sm:px-6 sm:py-5">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(59,130,246,0.18),_transparent_38%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_rgba(34,211,238,0.10),_transparent_28%)]" />
+    <>
+      <div className="sticky top-24 select-none rounded-3xl border border-slate-100 bg-white p-3 sm:p-4 shadow-xl shadow-slate-100/60">
+        {/* کانتینر تصویر اصلی */}
+        <div
+          onTouchStart={(e) => setTouchStartX(e.targetTouches[0].clientX)}
+          onTouchEnd={handleTouchEnd}
+          onClick={() => setIsOpen(true)}
+          className="group relative aspect-square w-full cursor-zoom-in overflow-hidden rounded-2xl bg-gradient-to-b from-slate-50 to-slate-100/60"
+        >
+          {/* دکمه ذره‌بین */}
+          <button
+            type="button"
+            className="absolute left-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-xl bg-white/80 text-slate-700 shadow-sm backdrop-blur-md transition-all hover:scale-110 hover:bg-blue-600 hover:text-white"
+            title="بزرگ‌نمایی"
+          >
+            <FaSearchPlus className="text-xs" />
+          </button>
 
-        <div className="relative flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold text-blue-600">تصویر محصول</p>
-            <h2 className="mt-1 line-clamp-2 text-sm font-bold text-slate-700 sm:text-base">
-              {title || "محصول"}
-            </h2>
-          </div>
-
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/90 text-blue-700 shadow-sm">
-            <FaSearchPlus className="text-base" />
-          </div>
-        </div>
-      </div>
-
-      {/* Main image area */}
-      <div className="p-4 sm:p-6">
-        <div className="relative flex min-h-[320px] items-center justify-center overflow-hidden rounded-[24px] border border-blue-50 bg-gradient-to-br from-slate-50 via-white to-blue-50/60 p-6 sm:min-h-[460px]">
-          <div className="absolute inset-0 bg-[radial-gradient(circle,_rgba(59,130,246,0.08),_transparent_55%)]" />
-
+          {/* تصویر فعال */}
           <Image
-            src={image || "/images/placeholder.png"}
-            alt={title || "product"}
-            width={700}
-            height={700}
+            src={imageList[activeIdx]}
+            alt={`${title} - ${activeIdx + 1}`}
+            fill
             priority
-            className="relative z-10 h-auto max-h-[280px] w-auto object-contain transition duration-300 hover:scale-105 sm:max-h-[390px]"
+            sizes="(max-width: 768px) 100vw, 500px"
+            className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
           />
+
+          {/* کنترل‌های ورق زدن (فقط در صورت وجود بیش از ۱ تصویر) */}
+          {total > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={prev}
+                className="absolute left-3 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-md backdrop-blur-sm transition-all hover:scale-110 hover:bg-blue-600 hover:text-white sm:opacity-0 sm:group-hover:opacity-100"
+              >
+                <FaChevronLeft className="text-xs" />
+              </button>
+
+              <button
+                type="button"
+                onClick={next}
+                className="absolute right-3 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-md backdrop-blur-sm transition-all hover:scale-110 hover:bg-blue-600 hover:text-white sm:opacity-0 sm:group-hover:opacity-100"
+              >
+                <FaChevronRight className="text-xs" />
+              </button>
+
+              {/* نشانگر مینیمال شماره عکس */}
+              <div className="absolute right-3 top-3 z-10 rounded-full bg-slate-900/60 px-2.5 py-0.5 text-[11px] font-bold text-white backdrop-blur-md">
+                {activeIdx + 1} / {total}
+              </div>
+            </>
+          )}
         </div>
+
+        {/* لیست تصاویر بندانگشتی (Thumbnails) */}
+        {total > 1 && (
+          <div className="mt-3 flex gap-2.5 overflow-x-auto pb-1 scrollbar-none">
+            {imageList.map((img, idx) => (
+              <button
+                key={`${img}-${idx}`}
+                type="button"
+                onClick={() => setActiveIdx(idx)}
+                className={`relative h-16 w-16 sm:h-[72px] sm:w-[72px] shrink-0 overflow-hidden rounded-xl border-2 bg-white transition-all duration-200 ${
+                  idx === activeIdx
+                    ? "border-blue-600 ring-2 ring-blue-500/20 scale-100"
+                    : "border-slate-200/80 opacity-60 hover:opacity-100 hover:border-slate-300"
+                }`}
+              >
+                <Image src={img} alt={`thumb-${idx}`} fill sizes="72px" className="object-contain p-1" />
+              </button>
+            ))}
+          </div>
+        )}
       </div>
-    </div>
+
+      {/* لایت‌باکس با قابلیت زوم دوضرب و حرکات لمسی */}
+      <Lightbox
+        open={isOpen}
+        close={() => setIsOpen(false)}
+        index={activeIdx}
+        slides={useMemo(() => imageList.map((src) => ({ src })), [imageList])}
+        on={{ view: ({ index }) => setActiveIdx(index) }}
+        plugins={[Zoom, Thumbnails, Fullscreen]}
+        zoom={{ maxZoomPixelRatio: 3, scrollToZoom: true }}
+      />
+    </>
   );
 }
