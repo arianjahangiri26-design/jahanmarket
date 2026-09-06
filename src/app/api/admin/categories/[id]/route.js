@@ -6,6 +6,7 @@ import connectToDatabase from "@/lib/database/db";
  
 import { errorResponse, successResponse } from "@/lib/utils/apiResponse";
 import { updateCategorySchema  } from "@/lib/validators/admin/categories/categorie.validation";
+export const dynamic = "force-dynamic";
 
 export const runtime = "nodejs";
 

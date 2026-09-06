@@ -5,6 +5,7 @@ import { successResponse, errorResponse } from "@/lib/utils/apiResponse";
 import mongoose from "mongoose";
 import fs from "fs";
 import path from "path";
+export const dynamic = "force-dynamic";
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
