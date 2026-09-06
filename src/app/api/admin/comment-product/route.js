@@ -3,13 +3,14 @@ import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/database/db";
 import { getServerSession } from "next-auth";
 import { commentSchema } from "@/lib/validators/admin/product/comment/CommentProduct.validation";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-
+ 
+ 
 // ایمپورت مدل‌ها جهت ریجستر شدن در Mongoose برای Populate درست
  
 import product from "@/models/product";
 import CommentProduct from "@/models/CommentProduct.js/CommentProduct";
 import user from "@/models/users";
+import { authOptions } from "@/lib/auth/authOptions";
 export const dynamic = "force-dynamic";
  
  // GET: دریافت لیست تمام کامنت‌ها

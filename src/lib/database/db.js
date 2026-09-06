@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 
-// استفاده از globalThis برای پایداری در تمام محیط‌های Node.js
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+  throw new Error("اتصال پیدا نشد");
+}
+
 let cached = global.mongoose;
 
 if (!cached) {
@@ -8,34 +13,18 @@ if (!cached) {
 }
 
 async function connectToDatabase() {
-  const MONGODB_URI = process.env.MONGODB_URI;
-
-  // بررسی متغیر محیطی در زمان اجرای تابع (نه در لود اولیه ماژول)
-  if (!MONGODB_URI) {
-    throw new Error("اتصال پیدا نشد: متغیر MONGODB_URI تنظیم نشده است.");
-  }
-
   if (cached.conn) {
     return cached.conn;
   }
 
   if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      return mongoose;
-    });
+    cached.promise = mongoose
+      .connect(MONGODB_URI)
+      .then((mongoose) => {
+        return mongoose;
+      });
   }
-
-  try {
-    cached.conn = await cached.promise;
-  } catch (e) {
-    cached.promise = null;
-    throw e;
-  }
-
+  cached.conn = await cached.promise;
   return cached.conn;
 }
 
