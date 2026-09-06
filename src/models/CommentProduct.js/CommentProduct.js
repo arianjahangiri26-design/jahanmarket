@@ -15,7 +15,7 @@ const CommentProductSchema = new mongoose.Schema(
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Users",
+      ref: "users",
       required: [true, "شناسه نویسنده الزامی است"],
     },
     isApproved: {
