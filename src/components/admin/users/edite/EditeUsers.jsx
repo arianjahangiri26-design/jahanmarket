@@ -4,8 +4,8 @@ import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useFetch } from "@/hooks/crud/UseCrud";
    import { useFormContext } from "react-hook-form";
+import UserForm from "../form/FormUserAdmin.jsx";
 
-import UserForm from "../form/FormUserAdmin";
      
 
 export default function EditUserLogic() {

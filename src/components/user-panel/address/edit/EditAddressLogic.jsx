@@ -6,7 +6,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useFetch } from "@/hooks/crud/UseCrud";
 import FormProvider from "@/context/form/FormProvider";
 import AddressForm from "../Form/AddressForm";
-import { updateAddressSchema } from "@/lib/validators/admin/address/address.validation";
+import { updateAddressSchema } from "@/lib/validators/admin/address/address.validation.js";
+
     
 export default function EditAddressLogic() {
   const { id } = useParams();

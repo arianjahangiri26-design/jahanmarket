@@ -4,7 +4,8 @@ import { useFetch } from "@/hooks/crud/UseCrud";
    import { useFormContext } from "react-hook-form";
 
  
-import UserForm from "../form/FormUserAdmin";
+import UserForm from "../form/FormUserAdmin.jsx";
+
 import { useRouter } from "next/navigation";
   
 
