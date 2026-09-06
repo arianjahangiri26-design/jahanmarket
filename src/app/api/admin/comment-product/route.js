@@ -10,6 +10,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import product from "@/models/product";
 import CommentProduct from "@/models/CommentProduct.js/CommentProduct";
 import user from "@/models/users";
+export const dynamic = "force-dynamic";
  
  // GET: دریافت لیست تمام کامنت‌ها
 export async function GET() {
