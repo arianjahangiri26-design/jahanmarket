@@ -1,18 +1,24 @@
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+
 import connectToDatabase from "@/lib/database/db";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import CommentProduct from "@/models/CommentProduct.js/CommentProduct";
 
- 
+// جلوگیری از Static شدن Route
+export const dynamic = "force-dynamic";
+
+// mongoose باید در Node.js اجرا شود
+export const runtime = "nodejs";
+
 // ----------------------------------------------------
 // بررسی لاگین بودن کاربر
 // ----------------------------------------------------
 async function checkAuth() {
   const session = await getServerSession(authOptions);
 
-  if (!session || !session.user) {
+  if (!session?.user) {
     return {
       isAuthorized: false,
       status: 401,
@@ -28,12 +34,24 @@ async function checkAuth() {
 
 // ----------------------------------------------------
 // GET: دریافت کامنت‌های یک محصول
+// در این متد id، شناسه محصول است
 // ----------------------------------------------------
-export async function GET(req, { params }) {
+export async function GET(request, { params }) {
   try {
+    // در نسخه جدید Next.js باید params را await کنیم
     const { id } = await params;
 
-    // اعتبارسنجی ObjectId
+    if (!id) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "شناسه محصول ارسال نشده است",
+        },
+        { status: 400 }
+      );
+    }
+
+    // بررسی معتبر بودن شناسه محصول
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
         {
@@ -46,20 +64,35 @@ export async function GET(req, { params }) {
 
     await connectToDatabase();
 
+    // تبدیل صریح رشته به ObjectId
+    const productId = new mongoose.Types.ObjectId(id);
+
+    // فقط کامنت‌هایی که product آن‌ها برابر شناسه واردشده است
     const comments = await CommentProduct.find({
-      product: id,
+      product: productId,
     })
       .populate("user", "name email phoneNumber role")
       .populate("product", "name imageProduct")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     return NextResponse.json(
       {
         success: true,
+        message:
+          comments.length > 0
+            ? "نظرات محصول با موفقیت دریافت شدند"
+            : "نظری برای این محصول ثبت نشده است",
+        productId: id,
         count: comments.length,
         data: comments,
       },
-      { status: 200 }
+      {
+        status: 200,
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate",
+        },
+      }
     );
   } catch (error) {
     console.error("GET PRODUCT COMMENTS ERROR:", error);
@@ -67,7 +100,11 @@ export async function GET(req, { params }) {
     return NextResponse.json(
       {
         success: false,
-        message: "خطا در دریافت کامنت‌ها",
+        message: "خطا در دریافت نظرات محصول",
+        error:
+          process.env.NODE_ENV === "development"
+            ? error.message
+            : undefined,
       },
       { status: 500 }
     );
@@ -75,12 +112,11 @@ export async function GET(req, { params }) {
 }
 
 // ----------------------------------------------------
-// PATCH: تغییر وضعیت تایید کامنت
-// فقط کاربر لاگین کرده
+// PATCH: تغییر وضعیت تأیید کامنت
+// نکته: در این متد id، شناسه خود کامنت است
 // ----------------------------------------------------
-export async function PATCH(req, { params }) {
+export async function PATCH(request, { params }) {
   try {
-    // چک لاگین
     const auth = await checkAuth();
 
     if (!auth.isAuthorized) {
@@ -93,9 +129,19 @@ export async function PATCH(req, { params }) {
       );
     }
 
-    const { id } = await  params;
+    // در نسخه جدید Next.js باید params را await کنیم
+    const { id } = await params;
 
-    // اعتبارسنجی ObjectId
+    if (!id) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "شناسه کامنت ارسال نشده است",
+        },
+        { status: 400 }
+      );
+    }
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
         {
@@ -106,10 +152,22 @@ export async function PATCH(req, { params }) {
       );
     }
 
-    const body = await req.json();
+    let body;
+
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "اطلاعات ارسال‌شده معتبر نیست",
+        },
+        { status: 400 }
+      );
+    }
+
     const { isApproved } = body;
 
-    // اعتبارسنجی مقدار
     if (typeof isApproved !== "boolean") {
       return NextResponse.json(
         {
@@ -124,14 +182,18 @@ export async function PATCH(req, { params }) {
 
     const updatedComment = await CommentProduct.findByIdAndUpdate(
       id,
-      { isApproved },
+      {
+        $set: {
+          isApproved,
+        },
+      },
       {
         new: true,
         runValidators: true,
       }
     )
-      .populate("user", "name email")
-      .populate("product", "name");
+      .populate("user", "name email phoneNumber role")
+      .populate("product", "name imageProduct");
 
     if (!updatedComment) {
       return NextResponse.json(
@@ -146,9 +208,9 @@ export async function PATCH(req, { params }) {
     return NextResponse.json(
       {
         success: true,
-        message: `کامنت ${
-          isApproved ? "تأیید" : "رد"
-        } شد`,
+        message: isApproved
+          ? "کامنت با موفقیت تأیید شد"
+          : "تأیید کامنت با موفقیت لغو شد",
         data: updatedComment,
       },
       { status: 200 }
@@ -160,6 +222,10 @@ export async function PATCH(req, { params }) {
       {
         success: false,
         message: "خطا در بروزرسانی کامنت",
+        error:
+          process.env.NODE_ENV === "development"
+            ? error.message
+            : undefined,
       },
       { status: 500 }
     );
@@ -168,11 +234,10 @@ export async function PATCH(req, { params }) {
 
 // ----------------------------------------------------
 // DELETE: حذف کامنت
-// فقط کاربر لاگین کرده
+// نکته: در این متد id، شناسه خود کامنت است
 // ----------------------------------------------------
-export async function DELETE(req, { params }) {
+export async function DELETE(request, { params }) {
   try {
-    // چک لاگین
     const auth = await checkAuth();
 
     if (!auth.isAuthorized) {
@@ -185,9 +250,20 @@ export async function DELETE(req, { params }) {
       );
     }
 
-    const { id } = params;
+    // این قسمت در کد قبلی شما اشتباه بود
+    // در Next.js جدید باید params را await کنید
+    const { id } = await params;
 
-    // اعتبارسنجی ObjectId
+    if (!id) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "شناسه کامنت ارسال نشده است",
+        },
+        { status: 400 }
+      );
+    }
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
         {
@@ -200,7 +276,8 @@ export async function DELETE(req, { params }) {
 
     await connectToDatabase();
 
-    const deletedComment = await CommentProduct.findByIdAndDelete(id);
+    const deletedComment =
+      await CommentProduct.findByIdAndDelete(id);
 
     if (!deletedComment) {
       return NextResponse.json(
@@ -216,6 +293,9 @@ export async function DELETE(req, { params }) {
       {
         success: true,
         message: "کامنت با موفقیت حذف شد",
+        data: {
+          id: deletedComment._id,
+        },
       },
       { status: 200 }
     );
@@ -226,6 +306,10 @@ export async function DELETE(req, { params }) {
       {
         success: false,
         message: "خطا در حذف کامنت",
+        error:
+          process.env.NODE_ENV === "development"
+            ? error.message
+            : undefined,
       },
       { status: 500 }
     );
