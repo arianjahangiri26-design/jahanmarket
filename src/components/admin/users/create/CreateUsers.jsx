@@ -4,7 +4,8 @@ import { useFetch } from "@/hooks/crud/UseCrud";
    import { useFormContext } from "react-hook-form";
 
 import { useRouter } from "next/navigation";
-import UserForm from "../components/UserForm";
+import UserForm from "../form/FormUserAdmin";
+  
 
 /**
  * Logic component responsible for creating a new user
