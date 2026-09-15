@@ -1,5 +1,4 @@
-"use client";
-
+ 
 import dynamicImport from "next/dynamic";
 import React from "react";
 
