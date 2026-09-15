@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useFetch } from "@/hooks/crud/UseCrud";
 
 import ProductForm from "../form/FormProductAdmin";
-import FormProvider from "@/context/form/FormProvider";
+import { FormProvider } from 'react-hook-form';
+
 
 export default function CreateProductLogic() {
   const router = useRouter();

@@ -1,4 +1,5 @@
  
+import BannersAdsListLogic from "@/components/admin/BannerAds/get/BannersAdsListLogic";
 import dynamicImport from "next/dynamic";
 import React from "react";
 

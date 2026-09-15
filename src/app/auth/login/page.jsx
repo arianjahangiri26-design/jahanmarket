@@ -1,6 +1,7 @@
 "use client";
  
-import FormProvider from "@/context/form/FormProvider";
+import { FormProvider } from 'react-hook-form';
+
 import LoginContent from "@/features/users/login/logic/LogicLogin";
 import { loginSchema } from "@/lib/validators/auth/auth.schema";
  

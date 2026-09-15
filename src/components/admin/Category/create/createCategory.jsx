@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useFetch } from "@/hooks/crud/UseCrud"; 
 import { createCategorySchema } from "@/lib/validators/admin/categories/categorie.validation";
 import CategoryForm from "../Form/FormCategory";
-import FormProvider from "@/context/form/FormProvider";
+import { FormProvider } from 'react-hook-form';
+
 
 export default function CreateCategoryLogic() {
   const router = useRouter();

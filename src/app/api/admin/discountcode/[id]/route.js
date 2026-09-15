@@ -9,6 +9,7 @@ import { errorResponse, successResponse } from "@/lib/utils/apiResponse";
 import category from "@/models/Category";
 import DiscountCode from "@/models/discountcode";
  
+ 
 /**
  * GET /api/admin/discounts/:id
  * Get single discount details

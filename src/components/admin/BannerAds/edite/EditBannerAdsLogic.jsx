@@ -3,7 +3,8 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useFetch } from "@/hooks/crud/UseCrud";
-import FormProvider from "@/context/form/FormProvider";
+import { FormProvider } from 'react-hook-form';
+
 import BannerAdsForm from "../form/BannerAdsForm";
 import { updateBannerAdsSchema } from "@/lib/validators/admin/bannerAdes/bannerAds.validation";
 

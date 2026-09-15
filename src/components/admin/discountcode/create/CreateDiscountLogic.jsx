@@ -4,7 +4,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFetch } from "@/hooks/crud/UseCrud";
-import FormProvider from "@/context/form/FormProvider";
+import { FormProvider } from 'react-hook-form';
+
 import { createDiscountSchema } from "@/lib/validators/admin/discounts/discount.validation";
 import DiscountForm from "../form/FormDiscountAdmin";
 

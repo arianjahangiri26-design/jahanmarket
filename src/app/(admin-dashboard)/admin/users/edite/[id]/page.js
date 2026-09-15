@@ -1,10 +1,12 @@
  
  "use client";
  
-import EditUserLogic from "@/components/admin/users/edite/EditeUsers";
-import FormProvider from "@/context/form/FormProvider";
  
+import EditUserLogic from "@/components/admin/users/edite/EditeUsers";
+ 
+   
 import { updateUserSchema } from "@/lib/validators/admin/users/user.validation";
+import { FormProvider } from "react-hook-form";
  
 
  
