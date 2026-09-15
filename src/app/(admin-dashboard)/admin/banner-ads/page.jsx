@@ -1,19 +1,20 @@
+"use client";
 
+import dynamicImport from "next/dynamic";
+import React from "react";
 
-import BannersAdsListLogic from '@/components/admin/BannerAds/get/BannersAdsListLogic';
- 
+// لود داینامیک بدون SSR برای جلوگیری از شکست زمان بیلد
+const BannersAdsListLogic = dynamicImport(
+  () => import("@/components/admin/BannerAds/get/BannersAdsListLogic"),
+  { ssr: false }
+);
 
+export const dynamic = "force-dynamic";
 
-import React from 'react'
-
-const BannerAdsListPage = () => {
-    return (
-        <div>
-
-            <BannersAdsListLogic />
-
-        </div>
-    );
-};
-
-export default BannerAdsListPage;
+export default function BannerAdsListPage() {
+  return (
+    <div>
+      <BannersAdsListLogic />
+    </div>
+  );
+}
