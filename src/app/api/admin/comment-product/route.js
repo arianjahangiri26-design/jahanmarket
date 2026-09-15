@@ -3,30 +3,39 @@ import { NextResponse } from "next/server";
 import connectToDatabase from "@/lib/database/db";
 import { getServerSession } from "next-auth";
 import { commentSchema } from "@/lib/validators/admin/product/comment/CommentProduct.validation";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-
-// ایمپورت مدل‌ها جهت ریجستر شدن در Mongoose برای Populate درست
  
-import product from "@/models/product";
+ 
+import "@/models/users";
+import "@/models/product";
+ 
+import { authOptions } from "../../auth/[...nextauth]/route";
 import CommentProduct from "@/models/CommentProduct.js/CommentProduct";
-import user from "@/models/users";
- export const dynamic = 'force-dynamic';
+
  
- // GET: دریافت لیست تمام کامنت‌ها
+
+// GET: دریافت لیست تمام کامنت‌ها
 export async function GET() {
   try {
     await connectToDatabase();
-    
+
     const comments = await CommentProduct.find()
       .populate("user", "name email phoneNumber")
-      .populate("product", "name imageProduct")
-      .sort({ createdAt: -1 });
- 
-    return NextResponse.json({ success: true, data: comments });
+      .populate("product", "name images")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return NextResponse.json({
+      success: true,
+      data: comments,
+    });
   } catch (error) {
     console.error("GET COMMENTS ERROR:", error);
+
     return NextResponse.json(
-      { success: false, message: "خطا در دریافت کامنت‌ها" },
+      {
+        success: false,
+        message: "خطا در دریافت کامنت‌ها",
+      },
       { status: 500 }
     );
   }
@@ -39,7 +48,10 @@ export async function POST(req) {
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, message: "لطفاً ابتدا وارد حساب کاربری خود شوید" },
+        {
+          success: false,
+          message: "لطفاً ابتدا وارد حساب کاربری خود شوید",
+        },
         { status: 401 }
       );
     }
@@ -48,9 +60,16 @@ export async function POST(req) {
     const validation = commentSchema.safeParse(body);
 
     if (!validation.success) {
-      const errorMessages = validation.error.errors.map(err => err.message).join("، ");
+      const errorMessages = validation.error.issues
+        .map((err) => err.message)
+        .join("، ");
+
       return NextResponse.json(
-        { success: false, message: errorMessages, errors: validation.error.format() },
+        {
+          success: false,
+          message: errorMessages,
+          errors: validation.error.format(),
+        },
         { status: 400 }
       );
     }
@@ -64,17 +83,21 @@ export async function POST(req) {
     });
 
     return NextResponse.json(
-      { 
-        success: true, 
-        message: "کامنت شما ثبت شد و پس از تایید نمایش داده می‌شود", 
-        data: newComment 
+      {
+        success: true,
+        message: "کامنت شما ثبت شد و پس از تأیید نمایش داده می‌شود",
+        data: newComment.toObject(),
       },
       { status: 201 }
     );
   } catch (error) {
     console.error("CREATE COMMENT ERROR:", error);
+
     return NextResponse.json(
-      { success: false, message: "خطای سرور در ثبت کامنت" },
+      {
+        success: false,
+        message: "خطای سرور در ثبت کامنت",
+      },
       { status: 500 }
     );
   }

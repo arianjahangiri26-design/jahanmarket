@@ -2,6 +2,9 @@ import { readdir, mkdir } from "fs/promises";
 import { join } from "path";
 import { NextResponse } from "next/server";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const uploadDir = join(process.cwd(), "public", "uploads");
@@ -13,7 +16,8 @@ export async function GET() {
       .map((file) => `/uploads/${file}`);
 
     return NextResponse.json({ success: true, images }, { status: 200 });
-  } catch {
+  } catch (error) {
+    console.error("GET UPLOADS ERROR:", error);
     return NextResponse.json({ success: true, images: [] }, { status: 200 });
   }
-}ش
+}
