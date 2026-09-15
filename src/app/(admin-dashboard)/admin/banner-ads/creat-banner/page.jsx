@@ -1,7 +1,5 @@
 
-
- 
-"use clint"
+"use client"; // ✅ درست
 
 import CreateBannerAdsLogic from '@/components/admin/BannerAds/create/CreateBannerAdsLogic';
 import FormProvider from '@/context/form/FormProvider';
