@@ -1,7 +1,7 @@
 import { iranSans } from "@/lib/fonts";
 import "@/app/globals.css";
 import { HeroProviders } from "./components/providers/heroProviders";
- 
+ export const dynamic = 'force-dynamic';
 
  
 

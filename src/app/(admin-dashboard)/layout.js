@@ -3,7 +3,7 @@ import AdminHeader from "@/components/admin/layout/header/AdminHeader";
 import AdminSidebar from "@/components/admin/layout/sidebar/adminSidebar";
 import { HeroProviders } from "@/components/providers/heroProviders";
 import AdminFilters from "@/components/admin/filter/AdminFilters"; // کامپوننت جدید
- 
+ export const dynamic = 'force-dynamic';
  
 export default function Layout({ children }) {
   return (

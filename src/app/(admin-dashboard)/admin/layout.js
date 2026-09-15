@@ -1,7 +1,7 @@
  
 import { HeroProviders } from "@/components/providers/heroProviders";
 import AdminFilters from "@/components/admin/filter/AdminFilters"; // کامپوننت جدید
-
+export const dynamic = 'force-dynamic';
 
 export default function Layout({ children }) {
   return (

@@ -3,7 +3,7 @@ import "@/app/globals.css";
 import { HeroProviders } from "@/components/providers/heroProviders";
 import { CartProvider } from "@/context/cart/CartContext";
 import { SessionProviderWrapper } from "@/components/providers/auth/sesstionProvider";
- 
+ export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: "جهان مارکت",
