@@ -1,0 +1,21 @@
+@import "tailwindcss";
+@import "@heroui/styles"; /* این تمام استایل‌های HeroUI v3 را وارد می‌کند */
+
+@theme {
+  /* تنظیمات تم اختصاصی شما در Tailwind v4 */
+  --color-background: #F8FAFC;
+  --color-text-main: #0A2540;
+  --color-text-muted: #627D98;
+  --color-primary-brand: #0B3C5D;
+  --color-accent-brand: #E25B45;
+}
+
+:root {
+  --background: var(--color-background);
+  --foreground: var(--color-text-main);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+}
